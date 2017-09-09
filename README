@@ -1,0 +1,63 @@
+dawgmon 
+
+The name of this tool is based upon an episode of South Park in which Cartman
+is "Dawg the Hallway Monitor" in season 10, episode 10. It's a tool which helps
+one to monitor changes which have taken place on a Linux-based system since the
+previous time the tool was ran. 
+
+One way to use it is to monitor a whole swath of servers via ansible as dawgmon
+can automatically generate playbooks as well as parse and process the output
+produced by ansible. Combining it with a cronjob which runs dawgmon on a
+regular basis and then mails the result to the mailbox of the system
+administrator can help with identifying machines upon which nefarious things
+are happening.
+
+The other way it's useful is by generating a baseline before installing a piece
+of software. Then after installing this piece of software one will run the tool
+again and then it's easy to see which changes were made on the system. An
+example after establishing a baseline and then installing tor on an AWS Ubuntu
+Linux machine might yield something like this:
+
+[+] torbox.anvilventures.com: 39 changes detected (0 warnings)
+ +  file /etc/apparmor.d/abstractions/tor got created
+ +  file /etc/apparmor.d/cache/system_tor got created
+ +  file /etc/apparmor.d/local/system_tor got created
+ +  file /etc/apparmor.d/system_tor got created
+ +  file /etc/cron.weekly/tor got created
+ +  file /etc/default/tor got created
+ +  size of file /etc/group changed from 806 to 824
+ +  file /etc/group got modified on 2017-09-09 17:48:13.730833 +0000
+ +  size of file /etc/group- changed from 816 to 806
+ +  file /etc/group- got modified on 2017-02-20 12:53:05.000000 +0000
+ +  size of file /etc/gshadow changed from 681 to 696
+ +  file /etc/gshadow got modified on 2017-09-09 17:48:13.734833 +0000
+ +  size of file /etc/gshadow- changed from 687 to 681
+ +  file /etc/gshadow- got modified on 2017-02-20 12:53:05.000000 +0000
+ +  file /etc/init.d/.depend.boot got modified on 2017-09-09 17:48:14.098839 +0000
+ +  size of file /etc/init.d/.depend.start changed from 955 to 988
+ +  file /etc/init.d/.depend.start got modified on 2017-09-09 17:48:14.098839 +0000
+ +  size of file /etc/init.d/.depend.stop changed from 1019 to 1047
+ +  file /etc/init.d/.depend.stop got modified on 2017-09-09 17:48:14.098839 +0000
+ +  file /etc/init.d/tor got created
+ +  file /etc/logrotate.d/tor got created
+ +  size of file /etc/passwd changed from 1837 to 1883
+ +  file /etc/passwd got modified on 2017-09-09 17:48:13.778834 +0000
+ +  size of file /etc/passwd- changed from 1787 to 1883
+ +  file /etc/passwd- got modified on 2017-09-09 17:48:13.000000 +0000
+ +  size of file /etc/shadow changed from 1504 to 1536
+ +  file /etc/shadow got modified on 2017-09-09 17:48:13.794834 +0000
+ +  size of file /etc/shadow- changed from 1376 to 1536
+ +  file /etc/shadow- got modified on 2017-09-09 17:48:13.000000 +0000
+ +  file /etc/tor/torrc got created
+ +  file /etc/tor/torsocks.conf got created
+ +  group debian-tor added
+ +  user debian-tor added
+ +  package tor added to package list
+ +  package tor-geoipdb added to package list
+ +  package torsocks added to package list
+ +  systemd service tor added
+ +  port 9050 opened
+ +  listening UNIX socket /var/run/tor/control opened
+
+All rights reserved. Copyright (C) 2017 by Anvil Ventures LLC.
+For more information contact Vincent Berg <gvb@anvilventures.com>
