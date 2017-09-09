@@ -51,9 +51,6 @@ COMMANDS = [
 	ipc.ListListeningUNIXSocketsCommand
 ]
 
-"""
-"""
-
 # built up mapping from command names to command classes
 COMMAND_CACHE = {}
 for cmd in COMMANDS:
