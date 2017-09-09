@@ -2,14 +2,14 @@
 
 import os, tempfile, functools
 from datetime import datetime
+from argparse import ArgumentParser
 
 import commands
-from cache import cache_load, cache_save
 from commands import merge_keys_to_list
-from local import local_run
 from ansible import *
-
-VERSION = "0.2a"
+from cache import cache_load, cache_save
+from local import local_run
+from version import VERSION
 
 def compare_hosts(old, new, commandlist=None):
 	anomalies = []
@@ -62,7 +62,6 @@ def print_anomalies(anomalies, show_debug=False):
 				print(" -  %s" % d[1])
 
 def run(tmpdirname):
-	from argparse import ArgumentParser
 	default_max_cache_entries = 64
 	parser = ArgumentParser(description="attack surface analyzer and change monitor")
 	parser.add_argument("-v", "--version", action="version", version=VERSION)
