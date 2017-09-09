@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, tempfile, functools
+import sys, os, tempfile, functools
 from datetime import datetime
 from argparse import ArgumentParser
 
@@ -62,22 +62,28 @@ def print_anomalies(anomalies, show_debug=False):
 				print(" -  %s" % d[1])
 
 def run(tmpdirname):
-	default_max_cache_entries = 64
+
+	default_max_cache_entries = 16
+	default_cache_name = ".dawgmon.db"
+
+	# parsing and checking arguments
 	parser = ArgumentParser(description="attack surface analyzer and change monitor")
 	parser.add_argument("-v", "--version", action="version", version=VERSION)
 	parser.add_argument("-H", "--host", help="", action="append", dest="use_ansible", metavar="host")
 	parser.add_argument("-L", help="list cache entries", dest="list_cache", action="store_true", default=False)
-	parser.add_argument("-c", help="location of cache (default: $CWD/cache.db)", dest="cache_location", metavar="filename", default="./cache.db", required=False)
+	parser.add_argument("-c", help="location of cache (default: $HOME/%s)" % (default_cache_name), dest="cache_location", metavar="filename", default=None, required=False)
 	parser.add_argument("-e", help="execute specific command", dest="commandlist", metavar="command", type=str, action="append")
 	parser.add_argument("-d", help="show debug output", dest="show_debug", action="store_true", default=False)
 	parser.add_argument("-m", help="max amount of cache entries per host (default: %i)" % default_max_cache_entries,
 		dest="max_cache_entries", type=int, metavar="N", default=default_max_cache_entries, required=False)
-
 	args = parser.parse_args()
 
 	if args.max_cache_entries < 1 or args.max_cache_entries > 1024:
 		print("maximum number of cache entries invalid or set too high [1-1024]")
-		return
+		sys.exit(1)
+
+	if not args.cache_location:
+		args.cache_location = os.path.join(os.getenv("HOME"), default_cache_name)
 
 	if args.list_cache:
 		cache = cache_load(args.cache_location)
