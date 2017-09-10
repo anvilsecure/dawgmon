@@ -5,7 +5,7 @@ class CheckGroupsCommand(Command):
 	shell = False
 	command = "cat /etc/group"
 
-	def convert_to_dict(data):
+	def parse(data):
 		data = data.splitlines()
 		res = {}
 		for line in data:
@@ -16,10 +16,8 @@ class CheckGroupsCommand(Command):
 			res[parts[0]] = (int(parts[2]), users)
 		return res
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def compare(prev, cur):
 		anomalies = []
-		prev, cur = cls.convert_to_dict(prev), cls.convert_to_dict(cur)
 		groups = merge_keys_to_list(prev, cur)
 		for group in groups:
 			if group not in prev:
@@ -45,7 +43,7 @@ class CheckUsersCommand(Command):
 	shell = False
 	command = "cat /etc/passwd"
 
-	def convert_to_dict(data):
+	def parse(data):
 		data = data.splitlines()
 		res = {}
 		for line in data:
@@ -56,10 +54,8 @@ class CheckUsersCommand(Command):
 			res[login] = (uid, gid, homedir, shell)
 		return res
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def compare(prev, cur):
 		anomalies = []
-		prev, cur = cls.convert_to_dict(prev), cls.convert_to_dict(cur)
 		users = merge_keys_to_list(prev, cur)
 		for user in users:
 			if user not in prev:

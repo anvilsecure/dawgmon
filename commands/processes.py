@@ -5,7 +5,7 @@ class CheckProcessessCommand(Command):
 	shell = False
 	command = "ps aux"
 
-	def parse_output(output):
+	def parse(output):
 		res = {}
 		lines = output.splitlines()
 		# ignore the first header line of the output
@@ -21,10 +21,8 @@ class CheckProcessessCommand(Command):
 			res[pid] = (cmd, user, start)
 		return res
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def compare(prev, cur):
 		anomalies = []
-		prev, cur = cls.parse_output(prev), cls.parse_output(cur)
 		processes = merge_keys_to_list(prev, cur)
 		for process in processes:
 			if process not in prev:

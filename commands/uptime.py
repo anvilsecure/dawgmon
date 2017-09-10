@@ -1,22 +1,26 @@
 from . import *
-import time
+from datetime import datetime
+
+PARSE_STR = "%Y-%m-%d %H:%M:%S"
 
 class UptimeCommand(Command):
 	name = "uptime"
 	shell = False
 	command = "uptime -s"
 
-	@classmethod
-	def compare(cls, prev, cur):
-		parse_str = "%Y-%m-%d %H:%M:%S"
-		prev = prev.strip()
-		cur = cur.strip()
-		dcur = time.strptime(cur, parse_str)
-		# if nothing cached yet we need to prevent parsing errors
-		dprev = time.strptime(prev, parse_str) if prev != "" else None
-		if not dprev:
-			return [D("system has been up since %s" % cur)]
-		if dcur != dprev and dcur > dprev:
-			return [W("system rebooted since last check (up since: %s)" % cur)]
+	def parse(output):
+		if not output:
+			return None 
+		try:
+			return datetime.strptime(output.strip(), PARSE_STR)
+		except ValueError:
+			return None
+
+	def compare(prev, cur):
+		scur = cur.strftime(PARSE_STR)
+		if not prev:
+			return [D("system has been up since %s" % scur)]
+		if cur != prev and cur > prev:
+			return [W("system rebooted since last check (up since: %s)" % scur)]
 		else:
-			return [D("system didn't reboot since last check (up since: %s)" % cur)]
+			return [D("system didn't reboot since last check (up since: %s)" % scur)]

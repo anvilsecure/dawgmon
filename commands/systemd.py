@@ -5,7 +5,7 @@ class ListSystemDServicesCommand(Command):
 	shell = False
 	command = "/usr/sbin/service --status-all"
 
-	def parse_output(output):
+	def parse(output):
 		res = {}
 		lines = output.splitlines()
 		for line in lines:
@@ -13,11 +13,8 @@ class ListSystemDServicesCommand(Command):
 			res[parts[3]] = parts[1]
 		return res
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def compare(prev, cur):
 		anomalies = []
-		prev = cls.parse_output(prev)
-		cur = cls.parse_output(cur)
 		services = merge_keys_to_list(prev, cur)
 		for service in services:
 			if service not in prev:	

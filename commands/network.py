@@ -5,7 +5,7 @@ class ListListeningTCPUDPPortsCommand(Command):
 	shell = False
 	command = "netstat --tcp --udp -ln"
 
-	def parse_output(output):
+	def parse(output):
 		res = {}
 		output = output.splitlines()[2:]
 		for line in output:
@@ -17,11 +17,8 @@ class ListListeningTCPUDPPortsCommand(Command):
 			res[port] = tuple(set(res[port]))
 		return res
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def compare(prev, cur):
 		anomalies = []
-		prev = cls.parse_output(prev)
-		cur = cls.parse_output(cur)
 		ports = merge_keys_to_list(prev, cur)
 		for port in ports:
 			if port not in cur:

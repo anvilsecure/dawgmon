@@ -18,11 +18,11 @@ class ListSharedMemorySegmentsCommand(Command):
 	shell = False
 	command = "ipcs -m"
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def parse(output):
+		return parse_ipcs_output(output)
+
+	def compare(prev, cur):
 		anomalies = []
-		prev = parse_ipcs_output(prev)
-		cur = parse_ipcs_output(cur)
 		segments = merge_keys_to_list(prev, cur)
 		for shmid in segments:
 			if shmid not in cur:
@@ -47,11 +47,11 @@ class ListSemaphoreArraysCommand(Command):
 	shell = False
 	command = "ipcs -s"
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def parse(output):
+		return parse_ipcs_output(output)
+
+	def compare(prev, cur):
 		anomalies = []
-		prev = parse_ipcs_output(prev)
-		cur = parse_ipcs_output(cur)
 		queues = merge_keys_to_list(prev, cur)
 		for q in queues:
 			if q not in cur:
@@ -67,11 +67,11 @@ class ListMessageQueuesCommand(Command):
 	shell = False
 	command = "ipcs -q"
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def parse(output):
+		return parse_ipcs_output(output)
+
+	def compare(prev, cur):
 		anomalies = []
-		prev = parse_ipcs_output(prev)
-		cur = parse_ipcs_output(cur)
 		queues = merge_keys_to_list(prev, cur)
 		for q in queues:
 			if q not in cur:
@@ -87,7 +87,7 @@ class ListListeningUNIXSocketsCommand(Command):
 	shell = False
 	command = "netstat -lx"
 
-	def parse_output(output):
+	def parse(output):
 		res = {}
 		output = output.splitlines()[2:]
 		for line in output:
@@ -101,11 +101,8 @@ class ListListeningUNIXSocketsCommand(Command):
 			res[sock_name] = (i_node, sock_type)
 		return res
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def compare(prev, cur):
 		anomalies = []
-		prev = cls.parse_output(prev)
-		cur = cls.parse_output(cur)
 		sockets = merge_keys_to_list(prev, cur)
 		for sock in sockets:
 			if sock not in cur:

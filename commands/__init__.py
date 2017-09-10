@@ -17,8 +17,11 @@ def merge_keys_to_list(d1, d2):
 # base Command class
 class Command:
 	@classmethod
+	def parse(cls, output):
+		raise Exception("not implemented for %s" % str(cls))
+	@classmethod
 	def compare(cls, prev, cur):
-		raise Exception("not implemented for %s" % cls)
+		raise Exception("not implemented for %s" % str(cls))
 
 from .files import *
 from .ipc import *

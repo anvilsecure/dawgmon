@@ -10,7 +10,7 @@ class CheckFilesInDirectoryCommand(Command):
 	# two arguments should be start directory and file type (pipe, symlink, regular file etc)
 	command = "find %s -type %s -exec ls --full-time -la \{\} \; 2>>/dev/null"
 
-	def parse_output(output):
+	def parse(output):
 		res = {}
 		lines = output.splitlines()
 		for line in lines:
@@ -30,11 +30,8 @@ class CheckFilesInDirectoryCommand(Command):
 			res[fn] = (user, group, size, dt, perm)
 		return res
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def compare(prev, cur):
 		anomalies = []
-		prev = cls.parse_output(prev)
-		cur = cls.parse_output(cur)
 		fns = merge_keys_to_list(prev, cur)
 		for fn in fns:
 			if fn not in cur:
@@ -72,8 +69,7 @@ class CheckForPipesCommand(CheckFilesInDirectoryCommand):
 	directory = "/"
 	command = CheckFilesInDirectoryCommand.command % (directory, "p")
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def compare(prev, cur):
 		# somewhat dirty hack to make this more descriptive by
 		# changing the language for all the named UNIX pipes
 		# to state pipe instead of file.
@@ -86,13 +82,12 @@ class CheckForPipesCommand(CheckFilesInDirectoryCommand):
 			anomalies.append((r[0], r[1].replace("file", "pipe", 1)))
 		return anomalies
 
-class FindSuidBinariesCommand(Command):
+class FindSuidBinariesCommand(CheckFilesInDirectoryCommand):
 	name = "find_suids"
 	shell = True
 	command = "find / -xdev -type f \( -perm -4000 -o -perm -2000 \) -exec ls --full-time -la \{\} \; 2>>/dev/null"
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def compare(prev, cur):
 		# somewhat dirty hack to make this more descriptive by
 		# changing the language for all the suid binaries to state
 		# suid binary instead of file.

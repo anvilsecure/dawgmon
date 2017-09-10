@@ -5,8 +5,10 @@ class IsRestartRequiredCommand(Command):
 	shell = True 
 	command = "if test -f /var/run/reboot-required.pkgs ; then cat /var/run/reboot-required.pkgs; fi"
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def parse(output):
+		return output
+
+	def compare(prev, cur):
 		if len(cur) > 0:
 			return [W("reboot required"), D("reboot required because of packages:\n%s" % cur)]
 		return []
@@ -16,7 +18,7 @@ class ListInstalledPackagesCommand(Command):
 	shell = False
 	command = "/usr/bin/dpkg --list"
 
-	def parse_output(output):
+	def parse(output):
 		res = {}
 		lines = output.splitlines()
 		header_done = False
@@ -33,11 +35,8 @@ class ListInstalledPackagesCommand(Command):
 			res[parts[1]] = (version, status)
 		return res
 
-	@classmethod
-	def compare(cls, prev, cur):
+	def compare(prev, cur):
 		anomalies = []
-		prev = cls.parse_output(prev)
-		cur = cls.parse_output(cur)
 		packages = merge_keys_to_list(prev, cur)
 		for package in packages:
 			if package not in prev:

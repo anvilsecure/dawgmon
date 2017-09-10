@@ -24,7 +24,9 @@ def compare_hosts(old, new, commandlist=None):
 			continue
 	
 		old_data = old[task_name] if task_name in old else ""
-		ret = cmd.compare(old_data, new[task_name])
+		old_data = cmd.parse(old_data)
+		new_data = cmd.parse(new[task_name])
+		ret = cmd.compare(old_data, new_data)
 		if type(ret) != list:
 			raise Exception("unexpected return value type for %s" % cmd)
 		if ret and len(ret) > 0:
