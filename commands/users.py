@@ -7,6 +7,13 @@ def is_empty(pw):
 	return not pw or len(pw) == 0
 def is_gshadow(pw):
 	return pw and pw == "x"
+def anonymize_pw(pw):
+	# the two utility functions above will also work if we
+	# replace the hash with an anonymous string and the results
+	# for all the checks will be the same here
+	if is_empty(pw) or is_gshadow(pw):
+		return pw
+	return "<anonymized>"
 
 class CheckGroupsCommand(Command):
 	name = "check_groups"
@@ -21,7 +28,8 @@ class CheckGroupsCommand(Command):
 			users = parts[3].split(",")
 			if len(users[0]) == 0:
 				users = []
-			res[parts[0]] = (int(parts[2]), users, parts[1])
+			pwhash_entry = anonymize_pw(parts[1])
+			res[parts[0]] = (int(parts[2]), users, pwhash_entry)
 		return res
 
 	def compare(prev, cur):
@@ -76,7 +84,8 @@ class CheckUsersCommand(Command):
 			login = parts[0]
 			uid, gid = int(parts[2]), int(parts[3])
 			homedir, shell = parts[5].strip(), parts[6].strip()
-			res[login] = (uid, gid, homedir, shell, parts[1])
+			pwhash_entry = anonymize_pw(parts[1])
+			res[login] = (uid, gid, homedir, shell, pwhash_entry)
 		return res
 
 	def compare(prev, cur):
