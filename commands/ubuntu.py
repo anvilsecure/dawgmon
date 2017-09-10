@@ -10,7 +10,9 @@ class IsRestartRequiredCommand(Command):
 
 	def compare(prev, cur):
 		if len(cur) > 0:
-			return [W("reboot required"), D("reboot required because of packages:\n%s" % cur)]
+			pkgs = cur.splitlines()
+			pkgs.sort()
+			return [W("reboot required"), D("reboot required because of packages [%s]" % (",".join(pkgs)))]
 		return []
 
 class ListInstalledPackagesCommand(Command):
