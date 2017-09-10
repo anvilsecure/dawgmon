@@ -1,14 +1,11 @@
-import os, subprocess
-import commands
-
-def get_output_filename(dirname):
-	return os.path.join(dirname, "output")
+import subprocess
+import commands, utils
 
 def local_run(dirname, commandlist=None):
 	res = {}
 	res["localhost"] = {}
 	rl = res["localhost"]
-	output = get_output_filename(dirname)
+	output = utils.get_output_filename(dirname)
 	for cmd in commands.COMMANDS:
 		if commandlist and cmd.name not in commandlist:
 			continue	

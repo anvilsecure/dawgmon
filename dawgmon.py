@@ -5,8 +5,8 @@ from datetime import datetime
 from argparse import ArgumentParser
 
 import commands
-from commands import merge_keys_to_list
-from ansible import *
+from utils import merge_keys_to_list
+from remote import *
 from cache import cache_load, cache_save
 from local import local_run
 from version import VERSION
@@ -110,7 +110,7 @@ def run(tmpdirname):
 		hosts = args.use_ansible
 		ansible_prepare(tmpdirname, hosts)
 		ansible_run(tmpdirname)
-		new = ansible_gather_results(get_output_filename(tmpdirname))
+		new = ansible_gather_results(tmpdirname)
 	else:
 		new = local_run(tmpdirname, args.commandlist)
 

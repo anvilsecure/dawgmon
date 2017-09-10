@@ -1,5 +1,5 @@
 import os, json, functools, subprocess
-import commands
+import commands, utils
 
 def get_hosts_filename(dirname):
 	return os.path.join(dirname, "hosts")
@@ -15,7 +15,8 @@ def ansible_prepare(dirname, hosts):
 		for cmd in commands.COMMANDS:
 			fd.write("    - name: %s\n      %s: %s\n      ignore_errors: yes\n\n" % (cmd.name, "shell" if cmd.shell else "command", cmd.command))
 
-def ansible_gather_results(outputfn):
+def ansible_gather_results(dirname):
+	outputfn = utils.get_output_filename(dirname)
 	with open(outputfn, "r") as fd:
 		data = json.load(fd)
 	play0 = data["plays"][0]
@@ -35,6 +36,6 @@ def ansible_gather_results(outputfn):
 	return res
 
 def ansible_run(dirname):
-	hosts, playbook, output = [functools.partial(x, dirname)() for x in [get_hosts_filename, get_playbook_filename, get_output_filename]]
+	hosts, playbook, output = [functools.partial(x, dirname)() for x in [get_hosts_filename, get_playbook_filename, utils.get_output_filename]]
 	os.putenv("ANSIBLE_STDOUT_CALLBACK", "json")	
 	subprocess.call("ansible-playbook -i %s %s > %s" % (hosts, playbook, output), shell=True)
