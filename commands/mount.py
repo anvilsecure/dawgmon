@@ -12,8 +12,7 @@ def change_attr_list_to_dict(attrs):
 class MountpointsCommand(Command):
 	name = "list_mount"
 	shell = False
-	#command = "mount"
-	command = "cat /tmp/mount"
+	command = "/bin/mount"
 
 	def parse(output):
 		lines = output.splitlines()
