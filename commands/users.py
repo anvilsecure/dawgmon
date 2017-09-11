@@ -39,6 +39,8 @@ class CheckGroupsCommand(Command):
 		for group in groups:
 			if group not in prev:
 				anomalies.append(C("group %s added" % group))
+				if cur[group][2]:
+					shadow_groups.append(group)
 				continue
 			elif group not in cur:
 				anomalies.append(C("group %s removed" % group))
