@@ -19,6 +19,7 @@ class Command:
 	def compare(cls, prev, cur):
 		raise Exception("not implemented for %s" % str(cls))
 
+from .env import *
 from .debian import *
 from .files import *
 from .ipc import *
@@ -37,6 +38,7 @@ COMMANDS = [
 	files.CheckEtcDirectoryCommand,
 	files.CheckForPipesCommand,
 	files.FindSuidBinariesCommand,
+	env.EnvironmentVariablesCommand,
 	ipc.ListMessageQueuesCommand,
 	ipc.ListSemaphoreArraysCommand,
 	ipc.ListSharedMemorySegmentsCommand,
