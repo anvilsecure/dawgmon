@@ -7,12 +7,15 @@ from argparse import ArgumentParser
 import commands
 from utils import merge_keys_to_list
 from remote import *
-from cache import cache_load, cache_save
+from cache import Cache
 from local import local_run
 from version import VERSION
 
-def compare_hosts(old, new, commandlist=None):
+def compare_output(old, new, commandlist=None):
 	anomalies = []
+	if not old:
+		# if None is passed in it's simply empty
+		old = {}
 	tasks = merge_keys_to_list(old, new)
 	for task_name in tasks:
 		cmd = commands.COMMAND_CACHE.get(task_name, None)
@@ -20,7 +23,6 @@ def compare_hosts(old, new, commandlist=None):
 			print("unknown task_name specified")
 			continue
 		if commandlist and task_name not in commandlist:
-			print("filtering out %s" % task_name)
 			continue
 	
 		old_data = old[task_name] if task_name in old else ""
@@ -33,35 +35,25 @@ def compare_hosts(old, new, commandlist=None):
 			anomalies = anomalies + ret
 	return anomalies
 
-def compare_output(old, new, commandlist=None):
-	anomalies = {}
-	hosts = merge_keys_to_list(old, new)
-	for host in hosts:
-		if host not in new:
-			print("host removed from the host list %s" % host)
-			continue
-		old_data = old[host] if host in old else {}
-		anomalies[host] = compare_hosts(old_data, new[host], commandlist)
-	return anomalies
-
-def print_anomalies(anomalies, show_debug=False):
-	for host in anomalies:
-		ah = anomalies[host]
-
-		changes = list(filter(lambda x:x[0] == commands.CHANGE, ah))
-		warning = list(filter(lambda x:x[0] == commands.WARNING, ah))
-		debug = list(filter(lambda x:x[0] == commands.DEBUG, ah)) if show_debug else []
-		la, lw, ld = len(changes), len(warning), len(debug)
-		debugs = " and %i debug message%s" % (ld, "s" if ld != 1 else "") if ld > 0 else ""
-		print("[+] %s: %i change%s detected (%i warning%s%s)" % (host, la, "s" if la != 1 else "", lw, "s" if lw != 1 else "", debugs))
-
-		for w in warning:
-			print(" !  %s" % w[1])
-		for c in changes:
-			print(" +  %s" % c[1])
-		if show_debug:
-			for d in debug:
-				print(" -  %s" % d[1])
+def print_anomalies(anomalies, show_debug=False, show_color=True):
+	changes = list(filter(lambda x:x[0] == commands.CHANGE, anomalies))
+	warning = list(filter(lambda x:x[0] == commands.WARNING, anomalies))
+	debug = list(filter(lambda x:x[0] == commands.DEBUG, anomalies)) if show_debug else []
+	c1 = "\x1b[32m" if show_color else ""
+	c2 = "\x1b[31m" if show_color else ""
+	c3 = "\x1b[36m" if show_color else ""
+	c4 = "\x1b[34m" if show_color else ""
+	c_end = "\x1b[0m" if show_color else ""
+	la, lw, ld = len(changes), len(warning), len(debug)
+	debugs = " and %i debug message%s" % (ld, "s" if ld != 1 else "") if ld > 0 else ""
+	print("%s%i change%s detected (%i warning%s%s)%s" % (c1, la, "s" if la != 1 else "", lw, "s" if lw != 1 else "", debugs, c_end))
+	for w in warning:
+		print("%s! %s%s" % (c2, w[1], c_end))
+	for c in changes:
+		print("%s+ %s%s" % (c3, c[1], c_end))
+	if show_debug:
+		for d in debug:
+			print("%s- %s%s" % (c4, d[1], c_end))
 
 def run(tmpdirname):
 
@@ -97,33 +89,39 @@ def run(tmpdirname):
 		print("!!!xx from cache!!!")
 		return
 
-	# determine whether we need to do an ansible run over a list of hosts or just
-	# run all the commands on the local machine
-	contains_localhost = False
-	if args.use_ansible:
-		contains_localhost = functools.reduce(lambda x,y:x or y, map(lambda x:x=="localhost", args.use_ansible))
-	if contains_localhost:
-		print("localhost set so ignoring all remote hosts (if any)")
 
-	# run the commands on the remote set of machines via ansible or locally
-	if args.use_ansible != None and not contains_localhost:
-		hosts = args.use_ansible
-		ansible_prepare(tmpdirname, hosts)
-		ansible_run(tmpdirname)
-		new = ansible_gather_results(tmpdirname)
+	# only add results to cache if a full analysis was run
+	add_to_cache = not args.commandlist
+
+	# run the selected list of commands
+	new = local_run(tmpdirname, args.commandlist)
+
+	# load last entry from cache
+	cache = Cache(args.cache_location)
+	cache.load()
+	old = cache.get_last_entry()
+
+	anomalies = []
+
+	# add new entry to cache if needed
+	if add_to_cache:
+		if not old:
+			anomalies.append(commands.W("no cache entry found yet so caching baseline now"))
+		cache.add_entry(new)
 	else:
-		new = local_run(tmpdirname, args.commandlist)
+		anomalies.append(commands.W("results not cached as only partial list of commands was run"))
 
-	cache = cache_load(args.cache_location)
-	ts, old = cache[-1] if len(cache) > 0 else ("1970-01-01 00:00:00", {})
-	anomalies = compare_output(old, new, args.commandlist)
+	# merge the list of differences with the previous list this is done
+	# such that the warnings added above will appear first when outputting
+	# the warnings later on in print_anomalies
+	anomalies = anomalies + compare_output(old, new, args.commandlist)
 
+	# output the detected anomalies
 	print_anomalies(anomalies, args.show_debug)
 
-	tsnow = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-	cache.append((tsnow, new))
-	cache = cache[-args.max_cache_entries:]
-	cache_save(cache, args.cache_location)
+	# update the cache
+	cache.purge(args.max_cache_entries)
+	cache.save()
 
 def main():
 	with tempfile.TemporaryDirectory() as tmpdirname:
