@@ -19,15 +19,16 @@ class Command:
 	def compare(cls, prev, cur):
 		raise Exception("not implemented for %s" % str(cls))
 
+from .debian import *
 from .files import *
 from .ipc import *
+from .network import *
 from .processes import *
 from .systemd import *
 from .ubuntu import *
 from .uptime import *
 from .users import *
 from .version import *
-from .network import *
 
 # commands will be executed in the order they appear in this list
 COMMANDS = [
@@ -41,7 +42,7 @@ COMMANDS = [
 	processes.CheckProcessessCommand,
 	systemd.ListSystemDServicesCommand,
 	ubuntu.IsRestartRequiredCommand,
-	ubuntu.ListInstalledPackagesCommand,
+	debian.ListInstalledPackagesCommand,
 	uptime.UptimeCommand,
 	users.CheckGroupsCommand,
 	users.CheckUsersCommand,
