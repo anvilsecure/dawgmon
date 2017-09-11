@@ -2,7 +2,7 @@ from . import *
 
 class EnvironmentVariablesCommand(Command):
 	name = "env"
-	shell = True
+	shell = False
 	command = "env"
 
 	def parse(output):
