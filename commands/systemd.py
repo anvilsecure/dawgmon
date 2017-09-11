@@ -170,7 +170,7 @@ class ListSystemDUnitFilesCommand(Command):
 				continue
 			p, c = prev[unit], cur[unit]
 			if p != c:
-				anomalies.append(C("systemd unit file %s status changed from %s to %s") % (unit, p, c))
+				anomalies.append(C("systemd unit file %s status changed from %s to %s" % (unit, p, c)))
 			anomalies.append(D("systemd unit file %s has status %s" % (unit, c)))
 		return anomalies
 
