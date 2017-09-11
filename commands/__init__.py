@@ -20,6 +20,7 @@ class Command:
 		raise Exception("not implemented for %s" % str(cls))
 
 
+from .block import *
 from .debian import *
 from .env import *
 from .files import *
@@ -43,6 +44,7 @@ COMMANDS = [
 	ipc.ListMessageQueuesCommand,
 	ipc.ListSemaphoreArraysCommand,
 	ipc.ListSharedMemorySegmentsCommand,
+	ipc.ListListeningUNIXSocketsCommand,
 	mount.MountpointsCommand,
 	processes.CheckProcessessCommand,
 	systemd.ListSystemDPropertiesCommand,
@@ -59,7 +61,7 @@ COMMANDS = [
 	version.KernelVersionCommand,
 	version.LSBVersionCommand,
 	network.ListListeningTCPUDPPortsCommand,
-	ipc.ListListeningUNIXSocketsCommand
+	block.ListBlockDevicesCommand
 ]
 
 # built up mapping from command names to command classes
