@@ -5,8 +5,6 @@
 
 - automatically look in database to try and find the latest baseline for a certain host if possible
 
-- files.py needs to be cleaned up
-
 - need to add support for containers and what not
   if we have the root support then systemctl list-machines seems to do the trick
   on systemd capable machines
