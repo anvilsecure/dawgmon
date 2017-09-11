@@ -1,9 +1,9 @@
-dawgmon 
+dawgmon - Dawg the Hallway Monitor
 
-The name of this tool is based upon an episode of South Park in which Cartman
-is "Dawg the Hallway Monitor" in season 10, episode 10. It's a tool which helps
-one to monitor changes which have taken place on a Linux-based system since the
-previous time the tool was ran. 
+The name of this tool is based upon an episode (season 10, episode 10) of South
+Park in which Cartman is Dawg the Hallway Monitor patrolling the hallways of
+his school.  It's a tool which helps one to monitor changes which have taken
+place on a Linux-based system since the previous time the tool was ran. 
 
 One way to use it is to monitor a whole swath of servers via ansible as dawgmon
 can automatically generate playbooks as well as parse and process the output

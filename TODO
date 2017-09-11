@@ -1,0 +1,12 @@
+- add crontab analysis with something like this
+  for user in $(cut -f1 -d: /etc/passwd); do echo $user; crontab -u $user -l; done
+  this means we need to have root options added to the system or at least
+  specify which commands in the list need root access specifically
+
+- automatically look in database to try and find the latest baseline for a certain host if possible
+
+- files.py needs to be cleaned up
+
+- need to add support for containers and what not
+  if we have the root support then systemctl list-machines seems to do the trick
+  on systemd capable machines
