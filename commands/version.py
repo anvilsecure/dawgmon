@@ -50,3 +50,38 @@ class KernelVersionCommand(Command):
 		if c > 0:
 			ret.append(W("kernel seems to have changed from %s to %s" % (" ".join(prev), " ".join(cur))))
 		return ret
+
+class LSBVersionCommand(Command):
+	name = "lsb_version"
+	shell = False
+	command = "/usr/bin/lsb_release -idcr"
+
+	def parse(output):
+		lines = output.splitlines()
+		if len(lines) != 4:
+			return {}
+		ret = {}
+		for line in lines:
+			lf = line.strip().find(":")
+			prop = line[0:lf].strip()
+			val = line[lf+1:].strip()
+			ret[prop] = val
+		return ret
+
+	def compare(prev, cur):
+		anomalies = []
+		entries = merge_keys_to_list(prev, cur)
+		for entry in entries:
+			p = prev[entry] if entry in prev else ""
+			c = cur[entry] if entry in cur else ""
+			if entry not in ["Description", "Distributor ID", "Codename", "Release"]:
+				anomalies.append(W("unknown entry '%s' returned by lsb_release prev: '%s', cur: '%s'" % (entry, p, c)))
+			elif p == "":
+				anomalies.append(C("LSB '%s' added with value '%s'" % (entry, c)))
+			elif c == "":
+				anomalies.append(W("LSB '%s' removed somehow (had value '%s')" % (entry, p)))
+			elif p != c:
+				anomalies.append(C("LSB %s changed from '%s' to '%s'" % (entry, p, c)))
+			else:
+				anomalies.append(D("LSB %s = %s" % (entry, c)))
+		return anomalies

@@ -53,6 +53,7 @@ COMMANDS = [
 	users.CheckGroupsCommand,
 	users.CheckUsersCommand,
 	version.KernelVersionCommand,
+	version.LSBVersionCommand,
 	network.ListListeningTCPUDPPortsCommand,
 	ipc.ListListeningUNIXSocketsCommand
 ]
