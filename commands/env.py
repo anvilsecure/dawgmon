@@ -22,12 +22,12 @@ class EnvironmentVariablesCommand(Command):
 		envvars = merge_keys_to_list(prev, cur)
 		for var in envvars:
 			if var not in prev:
-				anomalies.append(C("environment variable %s added (%s)" % (var, cur[var])))
+				anomalies.append(C("environment variable %s added and set to value '%s'" % (var, cur[var])))
 				continue
 			elif var not in cur:
-				anomalies.append(C("environment variable %s removed (%s)" % (var, prev[var])))
+				anomalies.append(C("environment variable %s removed and set to value '%s'" % (var, prev[var])))
 				continue
 			elif prev[var] != cur[var]:
 				anomalies.append(C("environment variable %s changed from '%s' to '%s'" % (var, prev[var], cur[var])))
-			anomalies.append(D("environment variable %s (%s)" % (var, cur[var])))
+			anomalies.append(D("environment variable %s=%s" % (var, cur[var])))
 		return anomalies
