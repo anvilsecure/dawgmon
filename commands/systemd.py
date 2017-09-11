@@ -202,5 +202,5 @@ class ListSystemDPropertiesCommand(Command):
 				continue
 			p, c = prev[propname], cur[propname]
 			if p != c:
-				anomalies.append(C("systemd property %s changed from %s to %s") % (propname, p, c))
+				anomalies.append(C("systemd property %s changed from %s to %s" % (propname, p, c)))
 		return anomalies
