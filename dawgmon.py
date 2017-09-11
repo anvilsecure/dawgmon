@@ -61,14 +61,20 @@ def run(tmpdirname):
 
 	# parsing and checking arguments
 	parser = ArgumentParser(description="attack surface analyzer and change monitor")
-	parser.add_argument("-v", "--version", action="version", version=VERSION)
-	parser.add_argument("-L", help="list cache entries", dest="list_cache", action="store_true", default=False)
-	parser.add_argument("-C", help="list available commands", dest="list_commands", action="store_true", default=False)
-	parser.add_argument("-f", help="location of database cache (default: $HOME/%s)" % (default_cache_name), dest="cache_location", metavar="filename", default=None, required=False)
-	parser.add_argument("-e", help="execute specific command", dest="commandlist", metavar="command", type=str, action="append")
+
+	group = parser.add_mutually_exclusive_group()
+	group.add_argument("-A", help="analyze system (default)", dest="analyze", action="store_true", default=True)
+	group.add_argument("-L", help="list cache entries", dest="list_cache", action="store_true", default=False)
+	group.add_argument("-C", help="list available commands", dest="list_commands", action="store_true", default=False)
+
+
 	parser.add_argument("-d", help="show debug output", dest="show_debug", action="store_true", default=False)
+	parser.add_argument("-e", help="execute specific command", dest="commandlist", metavar="command", type=str, action="append")
+	parser.add_argument("-f", help="location of database cache (default: $HOME/%s)" % (default_cache_name), dest="cache_location", metavar="filename", default=None, required=False)
+	parser.add_argument("-g", help="colorize the analysis output", dest="colorize", default=False, action="store_true")
 	parser.add_argument("-m", help="max amount of cache entries per host (default: %i)" % default_max_cache_entries,
 		dest="max_cache_entries", type=int, metavar="N", default=default_max_cache_entries, required=False)
+	parser.add_argument("-v", "--version", action="version", version=VERSION)
 	args = parser.parse_args()
 
 	if args.max_cache_entries < 1 or args.max_cache_entries > 1024:
@@ -95,6 +101,8 @@ def run(tmpdirname):
 		for cmd in cmd_list:
 			print(cmd)
 		return
+	elif not args.analyze:
+		return
 
 	# only add results to cache if a full analysis was run
 	add_to_cache = not args.commandlist
@@ -107,8 +115,8 @@ def run(tmpdirname):
 
 	# run the selected list of commands
 	new = local_run(tmpdirname, args.commandlist)
-	old = cache.get_last_entry()
 
+	old = cache.get_last_entry()
 	anomalies = []
 
 	# add new entry to cache if needed
@@ -125,7 +133,7 @@ def run(tmpdirname):
 	anomalies = anomalies + compare_output(old, new, args.commandlist)
 
 	# output the detected anomalies
-	print_anomalies(anomalies, args.show_debug)
+	print_anomalies(anomalies, args.show_debug, args.colorize)
 
 	# update the cache
 	cache.purge(args.max_cache_entries)
