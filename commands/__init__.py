@@ -19,10 +19,12 @@ class Command:
 	def compare(cls, prev, cur):
 		raise Exception("not implemented for %s" % str(cls))
 
-from .env import *
+
 from .debian import *
+from .env import *
 from .files import *
 from .ipc import *
+from .mount import *
 from .network import *
 from .processes import *
 from .systemd import *
@@ -31,7 +33,6 @@ from .ubuntu import *
 from .uptime import *
 from .users import *
 from .version import *
-
 # commands will be executed in the order they appear in this list
 COMMANDS = [
 	files.CheckBootDirectoryCommand,
@@ -42,6 +43,7 @@ COMMANDS = [
 	ipc.ListMessageQueuesCommand,
 	ipc.ListSemaphoreArraysCommand,
 	ipc.ListSharedMemorySegmentsCommand,
+	mount.MountpointsCommand,
 	processes.CheckProcessessCommand,
 	systemd.ListSystemDPropertiesCommand,
 	systemd.ListSystemDSocketsCommand,
