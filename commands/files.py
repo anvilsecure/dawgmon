@@ -98,7 +98,7 @@ class CheckBootDirectoryCommand(CheckFilesInDirectoryCommand):
 	command = CheckFilesInDirectoryCommand.command % (directory, "f")
 
 class CheckForPipesCommand(CheckFilesInDirectoryCommand):
-	name = "check_pipes"
+	name = "list_pipes"
 	directory = "/"
 	command = CheckFilesInDirectoryCommand.command % (directory, "p")
 
@@ -106,7 +106,7 @@ class CheckForPipesCommand(CheckFilesInDirectoryCommand):
 		return CheckFilesInDirectoryCommand.compare(prev, cur, "pipe")
 
 class FindSuidBinariesCommand(CheckFilesInDirectoryCommand):
-	name = "find_suids"
+	name = "list_suids"
 	shell = True
 	command = "find / -xdev -type f \( -perm -4000 -o -perm -2000 \) -exec ls --full-time -la \{\} \; 2>>/dev/null"
 
