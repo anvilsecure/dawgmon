@@ -19,7 +19,7 @@ class EnvironmentVariablesCommand(Command):
 
 	def compare(prev, cur):
 		anomalies = []
-		envvars = merge_keys_to_list(prev, cur)	
+		envvars = merge_keys_to_list(prev, cur)
 		for var in envvars:
 			if var not in prev:
 				anomalies.append(C("environment variable %s added (%s)" % (var, cur[var])))
