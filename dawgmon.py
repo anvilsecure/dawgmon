@@ -6,7 +6,6 @@ from argparse import ArgumentParser
 
 import commands
 from utils import merge_keys_to_list
-from remote import *
 from cache import Cache
 from local import local_run
 from version import VERSION
@@ -63,7 +62,6 @@ def run(tmpdirname):
 	# parsing and checking arguments
 	parser = ArgumentParser(description="attack surface analyzer and change monitor")
 	parser.add_argument("-v", "--version", action="version", version=VERSION)
-	parser.add_argument("-H", "--host", help="", action="append", dest="use_ansible", metavar="host")
 	parser.add_argument("-L", help="list cache entries", dest="list_cache", action="store_true", default=False)
 	parser.add_argument("-c", help="location of cache (default: $HOME/%s)" % (default_cache_name), dest="cache_location", metavar="filename", default=None, required=False)
 	parser.add_argument("-e", help="execute specific command", dest="commandlist", metavar="command", type=str, action="append")
