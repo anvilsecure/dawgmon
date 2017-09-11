@@ -25,6 +25,7 @@ from .ipc import *
 from .network import *
 from .processes import *
 from .systemd import *
+from .sysv import *
 from .ubuntu import *
 from .uptime import *
 from .users import *
@@ -40,12 +41,12 @@ COMMANDS = [
 	ipc.ListSemaphoreArraysCommand,
 	ipc.ListSharedMemorySegmentsCommand,
 	processes.CheckProcessessCommand,
-	systemd.ListSystemDServicesCommand,
 	systemd.ListSystemDPropertiesCommand,
-	systemd.ListSystemDTimersCommand,
 	systemd.ListSystemDSocketsCommand,
-	systemd.ListSystemDUnitsCommand,
+	systemd.ListSystemDTimersCommand,
 	systemd.ListSystemDUnitFilesCommand,
+	systemd.ListSystemDUnitsCommand,
+	sysv.ListSystemVInitJobsCommand,
 	ubuntu.IsRestartRequiredCommand,
 	debian.ListInstalledPackagesCommand,
 	uptime.UptimeCommand,
