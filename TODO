@@ -8,3 +8,7 @@
 - need to add support for containers and what not
   if we have the root support then systemctl list-machines seems to do the trick
   on systemd capable machines
+
+- writeup notes on filenames with -> in them
+
+- SELinux support?
