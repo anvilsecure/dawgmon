@@ -49,7 +49,7 @@ class Cache:
 				count = count + 1
 		return res
 
-	def get_entry(self, hostname, entry_id):
+	def get_entry(self, entry_id, hostname="localhost"):
 		entries = self.get_entries(hostname)
 		if len(entries) == 0:
 			return None
@@ -61,7 +61,7 @@ class Cache:
 		return self.data[hostname][entry_id]["data"]
 
 	def get_last_entry(self, hostname="localhost"):
-		return self.get_entry(hostname, -1)
+		return self.get_entry(-1, hostname)
 
 	def add_entry(self, data, hostname="localhost"):
 		self.data.setdefault(hostname, [])
