@@ -74,7 +74,7 @@ def run(tmpdirname):
 	parser.add_argument("-g", help="colorize the analysis output", dest="colorize", default=False, action="store_true")
 	parser.add_argument("-m", help="max amount of cache entries per host (default: %i)" % default_max_cache_entries,
 		dest="max_cache_entries", type=int, metavar="N", default=default_max_cache_entries, required=False)
-	parser.add_argument("-v", "--version", action="version", version=VERSION)
+	parser.add_argument("-v", "--version", action="version", version="dawgmon %s" % VERSION)
 	args = parser.parse_args()
 
 	if args.max_cache_entries < 1 or args.max_cache_entries > 1024:
