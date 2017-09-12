@@ -63,10 +63,10 @@ def run(tmpdirname):
 	parser = ArgumentParser(description="attack surface analyzer and change monitor")
 
 	group = parser.add_mutually_exclusive_group()
-	group.add_argument("-A", help="analyze system (default)", dest="analyze", action="store_true", default=True)
+	group.add_argument("-A", help="analyze system (default)", dest="analyze", action="store_true", default=False)
+	group.add_argument("-C", help="compare cache entry id1 with id2", dest="compare_cache", metavar=("id1", "id2"), nargs=2, type=int)
+	group.add_argument("-E", help="list available commands", dest="list_commands", action="store_true", default=False)
 	group.add_argument("-L", help="list cache entries", dest="list_cache", action="store_true", default=False)
-	group.add_argument("-C", help="list available commands", dest="list_commands", action="store_true", default=False)
-
 
 	parser.add_argument("-d", help="show debug output", dest="show_debug", action="store_true", default=False)
 	parser.add_argument("-e", help="execute specific command", dest="commandlist", metavar="command", type=str, action="append")
@@ -88,44 +88,55 @@ def run(tmpdirname):
 	cache = Cache(args.cache_location)
 	cache.load()
 
-	# execute main command
+	# list all the entries available in the cache
 	if args.list_cache:
 		entries = cache.get_entries()
 		print("  ID\tTIMESTAMP")
 		for entry in entries:
 			print("{:4d}\t%s".format(entry["id"]) % (entry["timestamp"]))
 		return
+	# list all the commands available
 	elif args.list_commands:
 		cmd_list = list(commands.COMMAND_CACHE.keys())
 		cmd_list.sort()
 		for cmd in cmd_list:
 			print(cmd)
 		return
-	elif not args.analyze:
+	elif not args.analyze and not args.compare_cache:
+		print("need to select from -A, -C, -E or -L")
 		return
 
 	# only add results to cache if a full analysis was run
-	add_to_cache = not args.commandlist
+	add_to_cache = not args.commandlist and args.analyze
 
 	# if no commandlist specified add all available commands
 	if not args.commandlist:
 		args.commandlist = []	
 		for cmd in commands.COMMANDS:
-			args.commandlist.append(cmd.name)
+				args.commandlist.append(cmd.name)
 
-	# run the selected list of commands
-	new = local_run(tmpdirname, args.commandlist)
 
-	old = cache.get_last_entry()
+	# run the selected list of commands or get cached results
 	anomalies = []
-
-	# add new entry to cache if needed
-	if add_to_cache:
-		if not old:
-			anomalies.append(commands.W("no cache entry found yet so caching baseline now"))
-		cache.add_entry(new)
+	if args.analyze:
+		new = local_run(tmpdirname, args.commandlist)
+		# add new entry to cache if needed but only if a full command list is being executed
+		old = cache.get_last_entry()
+		if add_to_cache:
+			if not old:
+				anomalies.append(commands.W("no cache entry found yet so caching baseline"))
+			cache.add_entry(new)
+		else:
+			anomalies.append(commands.W("results NOT cached as only partial command list being run"))
 	else:
-		anomalies.append(commands.W("results not cached as only partial list of commands was run"))
+		new = cache.get_entry(args.compare_cache[1])
+		if not new:
+			print("cannot find cache entry with id %i" % args.compare_cache[1])
+			return
+		old = cache.get_entry(args.compare_cache[0])
+		if not old:
+			print("cannot find cache entry with id %i" % args.compare_cache[0])
+			return
 
 	# merge the list of differences with the previous list this is done
 	# such that the warnings added above will appear first when outputting
