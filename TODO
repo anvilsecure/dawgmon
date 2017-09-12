@@ -14,3 +14,6 @@
 
 - better failed command line handling (cache stderr output too maybe?)
 
+- writeup notes on filenames with -> in them
+
+- SELinux support?
