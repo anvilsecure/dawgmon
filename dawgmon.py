@@ -84,6 +84,16 @@ def run(tmpdirname):
 	if not args.cache_location:
 		args.cache_location = os.path.join(os.getenv("HOME"), default_cache_name)
 
+	if not args.list_cache and not args.list_commands and not args.analyze and not args.compare_cache:
+		print("select an action -A/C/E/L")
+		return
+
+	if os.geteuid() != 0 and args.analyze:
+		print("It's strongly recommended to run an analysis as root.")
+		answer = input("Continue anyway with the analysis y/n? ")
+		if len(answer) != 1 or answer[0].lower() != 'y':
+			return
+
 	# load last entry from cache
 	cache = Cache(args.cache_location)
 	cache.load()
@@ -101,9 +111,6 @@ def run(tmpdirname):
 		cmd_list.sort()
 		for cmd in cmd_list:
 			print(cmd)
-		return
-	elif not args.analyze and not args.compare_cache:
-		print("need to select from -A, -C, -E or -L")
 		return
 
 	# only add results to cache if a full analysis was run
