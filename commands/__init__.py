@@ -61,6 +61,7 @@ COMMANDS = [
 	version.KernelVersionCommand,
 	version.LSBVersionCommand,
 	network.ListListeningTCPUDPPortsCommand,
+	network.ListNetworkInterfacesCommand,
 	block.ListBlockDevicesCommand
 ]
 
