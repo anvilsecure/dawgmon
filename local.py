@@ -1,12 +1,20 @@
-import subprocess
-import commands, utils
+import subprocess, shlex
+import commands
 
 def local_run(dirname, commandlist):
-	res = {}
-	output = utils.get_output_filename(dirname)
 	for cmdname in commandlist:
 		cmd = commands.COMMAND_CACHE[cmdname]
-		subprocess.call("%s > %s" % (cmd.command, output), shell=True)
-		with open(output, "r") as fd:
-			res[cmd.name] = fd.read()
-	return res
+
+		# shell escape such that we can pass command properly onwards
+		# to the Popen call
+		cmd_to_execute = shlex.split(cmd.command)
+
+		p = subprocess.Popen(cmd_to_execute, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		stdout, stderr = p.communicate()
+
+		# XXX we should probably try and get the system encoding for
+		# this instead of defaulting to UTF-8.
+		stdout = stdout.decode("utf-8")
+		stderr = stderr.decode("utf-8")
+
+		yield (cmd.name, "$ %s" % " ".join(cmd_to_execute), p.returncode, stdout, stderr)

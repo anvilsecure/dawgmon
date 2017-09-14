@@ -24,9 +24,10 @@ def compare_output(old, new, commandlist=None):
 		if commandlist and task_name not in commandlist:
 			continue
 	
-		old_data = old[task_name] if task_name in old else ""
+		# cache contains (stdout, stderr) of the executed tasks
+		old_data = old[task_name][0] if task_name in old else ""
 		old_data = cmd.parse(old_data)
-		new_data = cmd.parse(new[task_name])
+		new_data = cmd.parse(new[task_name][0])
 		ret = cmd.compare(old_data, new_data)
 		if type(ret) != list:
 			raise Exception("unexpected return value type for %s" % cmd)
@@ -127,7 +128,25 @@ def run(tmpdirname):
 	# run the selected list of commands or get cached results
 	anomalies = []
 	if args.analyze:
-		new = local_run(tmpdirname, args.commandlist)
+		new = {}
+		lc = len(args.commandlist)
+		done = 0
+		cmd_runner = local_run(tmpdirname, args.commandlist)
+		for res in cmd_runner:
+			print("%i/%i %s" % (done, lc, "[%s]".ljust(20) % (args.commandlist[done])), end="\r")
+			cmd_name, cmd_exec, retcode, cmd_stdout, cmd_stderr = res
+			done = done + 1
+			new[cmd_name] = (cmd_stdout, cmd_stderr)
+			if retcode == 0:
+				continue
+			print("%s failed with non-zero exit status (%i)" % (cmd_name, retcode))
+			if not args.show_debug:
+				print("run again with debug (-d) turned on to see stderr output")
+				return
+			print("\n%s\n" % cmd_exec)
+			print(cmd_stderr)
+			return
+
 		# add new entry to cache if needed but only if a full command list is being executed
 		old = cache.get_last_entry()
 		if add_to_cache:

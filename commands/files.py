@@ -17,13 +17,13 @@ class CheckFilesInDirectoryCommand(Command):
 	# command option --full-time is GNU file utils specific
 	# -b is for escaping characters in the filename such as spaces and what not more
 	# two arguments should be start directory and file type (pipe, symlink, regular file etc)
-	command = "find %s -type %s -exec ls --full-time -lba \{\} \; 2>>/dev/null"
+	command = "find %s -type %s -exec ls --full-time -lba \{\} \;"
 
 	def parse(output):
 		res = {}
-		output = bytes(output, "utf-8")
 		lines = output.splitlines()
 		for line in lines:
+			line = bytes(line, "utf-8")
 
 			# hack but with the escape (-b) option this should only trigger
 			# when it"s an actual symlink so we simply look for " -> " which
@@ -96,7 +96,7 @@ class CheckFilesInDirectoryCommand(Command):
 
 class CheckEtcDirectoryCommand(CheckFilesInDirectoryCommand):
 	name = "check_etc"
-	command = "find /etc -xdev \( -type f -o -type l \) -exec ls --full-time -lba \{\} \; 2>>/dev/null"
+	command = "find /etc -xdev \( -type f -o -type l \) -exec ls --full-time -lba \{\} \;"
 
 class CheckBootDirectoryCommand(CheckFilesInDirectoryCommand):
 	name = "check_boot"
@@ -114,7 +114,7 @@ class CheckForPipesCommand(CheckFilesInDirectoryCommand):
 class FindSuidBinariesCommand(CheckFilesInDirectoryCommand):
 	name = "list_suids"
 	shell = True
-	command = "find / -xdev -type f \( -perm -4000 -o -perm -2000 \) -exec ls --full-time -lba \{\} \; 2>>/dev/null"
+	command = "find / -xdev -type f \( -perm -4000 -o -perm -2000 \) -exec ls --full-time -lba \{\} \;"
 
 	def compare(prev, cur):
 		return CheckFilesInDirectoryCommand.compare(prev, cur, "suid binary")
