@@ -70,8 +70,9 @@ def run(tmpdirname):
 
 	parser.add_argument("-d", help="show debug output", dest="show_debug", action="store_true", default=False)
 	parser.add_argument("-e", help="execute specific command", dest="commandlist", metavar="command", type=str, action="append")
-	parser.add_argument("-f", help="location of database cache (default: $HOME/%s)" % (default_cache_name), dest="cache_location", metavar="filename", default=None, required=False)
+	parser.add_argument("-f", help="force action even if not seteuid root", dest="force", default=False, action="store_true")
 	parser.add_argument("-g", help="colorize the analysis output", dest="colorize", default=False, action="store_true")
+	parser.add_argument("-l", help="location of database cache (default: $HOME/%s)" % (default_cache_name), dest="cache_location", metavar="filename", default=None, required=False)
 	parser.add_argument("-m", help="max amount of cache entries per host (default: %i)" % default_max_cache_entries,
 		dest="max_cache_entries", type=int, metavar="N", default=default_max_cache_entries, required=False)
 	parser.add_argument("-v", "--version", action="version", version="dawgmon %s" % VERSION)
@@ -88,7 +89,7 @@ def run(tmpdirname):
 		print("select an action -A/C/E/L")
 		return
 
-	if os.geteuid() != 0 and args.analyze:
+	if not args.force and os.geteuid() != 0 and args.analyze:
 		print("It's strongly recommended to run an analysis as root.")
 		answer = input("Continue anyway with the analysis y/n? ")
 		if len(answer) != 1 or answer[0].lower() != 'y':
