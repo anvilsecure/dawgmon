@@ -3,7 +3,7 @@ from . import *
 class KernelVersionCommand(Command):
 	name = "kernel_version"
 	shell = True
-	command = "printf \"`uname -a`\\n`uname -v`\""
+	command = "/bin/sh -c 'printf \"`uname -a`\\n`uname -v`\"'"
 
 	def parse(output):
 		lines = output.splitlines()

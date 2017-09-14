@@ -3,7 +3,7 @@ from . import *
 class IsRestartRequiredCommand(Command):
 	name = "needs_restart"
 	shell = True 
-	command = "if test -f /var/run/reboot-required.pkgs ; then cat /var/run/reboot-required.pkgs; fi"
+	command = "/bin/sh -c 'if test -f /var/run/reboot-required.pkgs ; then cat /var/run/reboot-required.pkgs; fi'"
 
 	def parse(output):
 		return output
