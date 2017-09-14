@@ -15,27 +15,33 @@ class CheckFilesInDirectoryCommand(Command):
 	needs_subclass = True
 
 	# command option --full-time is GNU file utils specific
+	# -b is for escaping characters in the filename such as spaces and what not more
 	# two arguments should be start directory and file type (pipe, symlink, regular file etc)
-	command = "find %s -type %s -exec ls --full-time -la \{\} \; 2>>/dev/null"
+	command = "find %s -type %s -exec ls --full-time -lba \{\} \; 2>>/dev/null"
 
 	def parse(output):
 		res = {}
+		output = bytes(output, "utf-8")
 		lines = output.splitlines()
 		for line in lines:
-			parts = line.split()
-			lp = len(parts)
-			if lp != 9 and lp != 11:
-				continue
-			if lp == 11:
-				if parts[9] != "->":
-					# not a symlink? unexpected output
-					# just ignore this line
-					print("ignoring symlink??? :(((")
-					continue
-				symlink = parts[10]
+
+			# hack but with the escape (-b) option this should only trigger
+			# when it"s an actual symlink so we simply look for " -> " which
+			# can only be a part of the symlink output because if it would be
+			# a part of the filename it would be escaped to "\ ->\ ".
+			search = b" -> "
+			lf = line.find(search)
+			issymlink = False
+			if lf != -1:
+				symlink = line[lf+4:]
+				line = line[:lf]
 			else:
 				symlink = None
-			fn = parts[8]
+
+			parts = line.split(b" ", 8)
+			lp = len(parts)
+			fn = parts[8].decode("unicode-escape")
+			symlink = bytes(symlink).decode("unicode-escape") if symlink else None
 			perm = parts[0]
 			user, group, size = parts[2:5]
 			date, ts, tz = parts[5:8]
@@ -44,8 +50,8 @@ class CheckFilesInDirectoryCommand(Command):
 			# supporting up to micro-seconds so we 'divide' by 1000 by simply
 			# stripping off the last 3 bytes
 			ts = ts[:-3]
-			dt = datetime.strptime("%s %s %s" % (date, ts, tz), DATE_PARSE_STR)
-			res[fn] = (user, group, size, dt, perm, symlink)
+			dt = datetime.strptime("%s %s %s" % (date.decode("utf-8"), ts.decode("utf-8"), tz.decode("utf-8")), DATE_PARSE_STR)
+			res[fn] = (user.decode("utf-8"), group.decode("utf-8"), size, dt, perm.decode("utf-8"), symlink)
 		return res
 
 	def compare(prev, cur, desc="file"):
@@ -90,7 +96,7 @@ class CheckFilesInDirectoryCommand(Command):
 
 class CheckEtcDirectoryCommand(CheckFilesInDirectoryCommand):
 	name = "check_etc"
-	command = "find /etc -xdev \( -type l -o -type f  \) -exec ls --full-time -la \{\} \; 2>>/dev/null"
+	command = "find /etc -xdev \( -type f -o -type l \) -exec ls --full-time -lba \{\} \; 2>>/dev/null"
 
 class CheckBootDirectoryCommand(CheckFilesInDirectoryCommand):
 	name = "check_boot"
@@ -108,7 +114,7 @@ class CheckForPipesCommand(CheckFilesInDirectoryCommand):
 class FindSuidBinariesCommand(CheckFilesInDirectoryCommand):
 	name = "list_suids"
 	shell = True
-	command = "find / -xdev -type f \( -perm -4000 -o -perm -2000 \) -exec ls --full-time -la \{\} \; 2>>/dev/null"
+	command = "find / -xdev -type f \( -perm -4000 -o -perm -2000 \) -exec ls --full-time -lba \{\} \; 2>>/dev/null"
 
 	def compare(prev, cur):
 		return CheckFilesInDirectoryCommand.compare(prev, cur, "suid binary")
