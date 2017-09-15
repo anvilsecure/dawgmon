@@ -48,7 +48,7 @@ def parse_systemd_output_table(output):
 class ListSystemDSocketsCommand(Command):
 	name = "systemd_sockets"
 	shell = False
-	command = "%s list-sockets --all --full" % (SYSTEMCTL_BIN)
+	command = "%s list-sockets --full" % (SYSTEMCTL_BIN)
 
 	def parse(output):
 		res = {}
