@@ -17,7 +17,7 @@ class CheckFilesInDirectoryCommand(Command):
 	# command option --full-time is GNU file utils specific
 	# -b is for escaping characters in the filename such as spaces and what not more
 	# two arguments should be start directory and file type (pipe, symlink, regular file etc)
-	command = "find %s -type %s -exec ls --full-time -lba \{\} \;"
+	command = "find %s -xdev -type %s -exec ls --full-time -lba \{\} \;"
 
 	def parse(output):
 		res = {}
