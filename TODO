@@ -8,3 +8,8 @@
   on systemd capable machines
 
 - SELinux support; it would be nice if we could monitor SELinux changes to things too
+
+- add OS detection and make commands have different subcommands based on the
+  type of OS being detected f.e. execute on fbsd/obsd with find/ls commandline options
+  which are standard on the BSDs and on lnx execute with different ones standard
+  in the GNU coreutils world
