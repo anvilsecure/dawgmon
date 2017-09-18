@@ -7,6 +7,4 @@
   if we have the root support then systemctl list-machines seems to do the trick
   on systemd capable machines
 
-- writeup notes on filenames with -> in them
-
-- SELinux support?
+- SELinux support; it would be nice if we could monitor SELinux changes to things too
