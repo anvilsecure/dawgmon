@@ -134,15 +134,24 @@ def run(tmpdirname):
 		lc = len(args.commandlist)
 		done = 0
 		cmd_runner = local_run(tmpdirname, args.commandlist)
+		isatty = os.isatty(sys.stdout.fileno())
 		for res in cmd_runner:
-			print("%i/%i %s" % (done, lc, "[%s]".ljust(20) % (args.commandlist[done])), end="\r")
+			# if we're running on a TTY we're in interactive mode
+			# so we try to show some updates regarding progress
+			if isatty:
+				print("%i/%i %s" % (done, lc, "[%s]".ljust(20) % (args.commandlist[done])), end="\r")
 			cmd_name, cmd_exec, retcode, cmd_stdout, cmd_stderr = res
 			done = done + 1
 			new[cmd_name] = (cmd_stdout, cmd_stderr)
 			if retcode == 0:
 				continue
 			print("%s failed with non-zero exit status (%i)" % (cmd_name, retcode))
-			if not args.show_debug:
+
+			# we default back to always showing stderr output if
+			# we're not in interactive mode (which is f.e. the case
+			# if we get run from a cronjob with the output piped to
+			# a file for email purposes)
+			if isatty and not args.show_debug:
 				print("run again with debug (-d) turned on to see stderr output")
 				return
 			print("\n%s\n" % cmd_exec)
