@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# change SENDEMAIL to yes and change rest of the settings to send email with
+# the dawgmon analysis results
+SENDEMAIL=no
+HOST="hostname"
+MAILTO="root@hostname"
+MAILTONAME="root-user"
+MAILFROM=$MAILTO
+MAILFROMNAME=$MAILTONAME
+MAILBIN=/usr/sbin/ssmtp
+
+# run dawgmon and collect output to temporary file
+BIN=$(dirname "$(readlink -f "$0")")/dawgmon
+OUTPUT=$(mktemp)
+$BIN -fA > $OUTPUT
+
+# send out the email if $SENDEMAIL == "yes" only
+if [ "$SENDEMAIL" = "yes" ]; then
+MAIL=$(mktemp)
+printf "To: $MAILTONAME <$MAILTO>\n" >> $MAIL
+printf "From: $MAILFROMNAME <$MAILFROM>\n" >> $MAIL
+printf "Subject: dawgmon - $HOST\n" >> $MAIL
+cat $OUTPUT >> $MAIL
+cat $MAIL | $MAILBIN $MAILTO
+rm $MAIL
+else
+cat $OUTPUT
+fi
+
+# remove temporary output file
+rm $OUTPUT
