@@ -87,7 +87,9 @@ nc -l -p 4455
 The tool is not meant for complete accuracy. There are very serious
 recommendations normally to not rely on the output of GNU core-utils such as ls
 for tool input. In other words; one should rarely build tools to parse and rely
-on this type of output as it can change all the time.
+on this type of output as it can change all the time. Realistically the output
+of these tools is relatively stable as a lot of people and automatic tools
+already rely on their outputs for all kinds of purposes.
 
 However the tradeoff for dawgmon is the following; we would need to implement a
 lot of logic to do file system monitoring ourselves, build complex binaries
@@ -98,7 +100,7 @@ including change detection in very little time as the main dawgmon tool already
 takes care of caching, executing the command and then supplying the previous
 and current output when running a comparision to a command implementation. This
 means that on time-constrained projects one can very quickly add a new command
-run analysis on them.
+and run analysises including those new commands.
 
 A command can be added by simply inheriting from the Command class. This class
 is defined in commands/__init__.py. That file contains also the master list of
@@ -143,7 +145,7 @@ Further options to help with the analysis are:
 -g: colorize the output
 -l: location of the database cache to use
 -m: maximum amount of cache entries to allow in cache (if cache has more
-    entries than this amount it will truncate the database) 
+entries than this amount it will truncate the database) 
 
 For more usage information run the tool with -h.
 
@@ -160,8 +162,8 @@ being done. That would have to be implemented first.
 Regarding the finding of pipes, UNIX sockets, files in /boot, /etc and more one
 should note that the usage of -xdev passed to 'find' means that not all
 filesystems mounted under the start directory will be traversed. This means
-that for example /boot will be properly scanned but /boot/efi might not be. Some
-smarter approach will have to be used here in the future.
+that for example /boot will be properly scanned but /boot/efi might not be.
+Some smarter approach will have to be used here in the future.
 
 
 ABOUT
@@ -169,4 +171,6 @@ ABOUT
 All rights reserved. Copyright (C) 2017 by Anvil Ventures, LLC.
 For licensing information see LICENSE.
 For more information contact Vincent Berg <gvb@anvilventures.com>
-To find (updated) source code or contribute patches go to: https://github.com/anvilventures/dawgmon/
+
+To find updated source code or to contribute patches go to the following URL:
+https://github.com/anvilventures/dawgmon/
