@@ -64,7 +64,7 @@ def run(tmpdirname):
 	parser = ArgumentParser(description="attack surface analyzer and change monitor")
 
 	group = parser.add_mutually_exclusive_group()
-	group.add_argument("-A", help="analyze system (default)", dest="analyze", action="store_true", default=False)
+	group.add_argument("-A", help="analyze system", dest="analyze", action="store_true", default=False)
 	group.add_argument("-C", help="compare cache entry id1 with id2", dest="compare_cache", metavar=("id1", "id2"), nargs=2, type=int)
 	group.add_argument("-E", help="list available commands", dest="list_commands", action="store_true", default=False)
 	group.add_argument("-L", help="list cache entries", dest="list_cache", action="store_true", default=False)
@@ -79,6 +79,8 @@ def run(tmpdirname):
 	parser.add_argument("-v", "--version", action="version", version="dawgmon %s" % VERSION)
 	args = parser.parse_args()
 
+	isatty = os.isatty(sys.stdout.fileno())
+
 	if args.max_cache_entries < 1 or args.max_cache_entries > 1024:
 		print("maximum number of cache entries invalid or set too high [1-1024]")
 		sys.exit(1)
@@ -92,9 +94,14 @@ def run(tmpdirname):
 
 	if not args.force and os.geteuid() != 0 and args.analyze:
 		print("It's strongly recommended to run an analysis as root.")
+		if not isatty:
+			print("Running non-interactively (not on a TTY) so bailing out.")
+			print("Either run again with -f or run again as root.")
+			return
 		answer = input("Continue anyway with the analysis y/n? ")
 		if len(answer) != 1 or answer[0].lower() != 'y':
 			return
+
 
 	# load last entry from cache
 	cache = Cache(args.cache_location)
@@ -134,7 +141,6 @@ def run(tmpdirname):
 		lc = len(args.commandlist)
 		done = 0
 		cmd_runner = local_run(tmpdirname, args.commandlist)
-		isatty = os.isatty(sys.stdout.fileno())
 		for res in cmd_runner:
 			# if we're running on a TTY we're in interactive mode
 			# so we try to show some updates regarding progress
