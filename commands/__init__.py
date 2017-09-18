@@ -12,6 +12,7 @@ from utils import merge_keys_to_list
 
 # base Command class
 class Command:
+	desc = "<unknown description>"
 	@classmethod
 	def parse(cls, output):
 		raise Exception("not implemented for %s" % str(cls))

@@ -110,9 +110,11 @@ def run(tmpdirname):
 	# list all the commands available
 	elif args.list_commands:
 		cmd_list = list(commands.COMMAND_CACHE.keys())
+		ml = max([len(x) for x in cmd_list])
 		cmd_list.sort()
-		for cmd in cmd_list:
-			print(cmd)
+		print("%s\t%s" % ("NAME".ljust(ml), "DESCRIPTION"))
+		for cmd_name in cmd_list:
+			print("%s\t%s" % (cmd_name.ljust(ml), commands.COMMAND_CACHE[cmd_name].desc))
 		return
 
 	# only add results to cache if a full analysis was run

@@ -49,6 +49,7 @@ class ListSystemDSocketsCommand(Command):
 	name = "systemd_sockets"
 	shell = False
 	command = "%s list-sockets --full" % (SYSTEMCTL_BIN)
+	desc = "list systemd sockets"
 
 	def parse(output):
 		res = {}
@@ -77,6 +78,7 @@ class ListSystemDTimersCommand(Command):
 	name = "systemd_timers"
 	shell = False
 	command = "%s list-timers --all --full" % (SYSTEMCTL_BIN)
+	desc = "list systemd timers"
 
 	def parse(output):
 		res = {}
@@ -104,6 +106,7 @@ class ListSystemDUnitsCommand(Command):
 	name = "systemd_units"
 	shell = False
 	command = "%s --all --full" % (SYSTEMCTL_BIN)
+	desc = "list all available systemd units"
 
 	def parse(output):
 		res = {}
@@ -142,6 +145,7 @@ class ListSystemDUnitFilesCommand(Command):
 	name = "systemd_unitfiles"
 	shell = False
 	command = "%s list-unit-files --all --full" % (SYSTEMCTL_BIN)
+	desc = "list all available systemd unit files"
 
 	def parse(output):
 		res = {}
@@ -178,6 +182,7 @@ class ListSystemDPropertiesCommand(Command):
 	name = "systemd_props"
 	shell = False
 	command = "%s show --all --full" % (SYSTEMCTL_BIN)
+	desc = "show all systemd properties"
 
 	def parse(output):
 		res = {}

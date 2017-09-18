@@ -4,6 +4,7 @@ class ListSystemVInitJobsCommand(Command):
 	name = "list_sysvinit_jobs"
 	shell = False
 	command = "/usr/sbin/service --status-all"
+	desc = "analyze changes in available System V init jobs"
 
 	def parse(output):
 		res = {}

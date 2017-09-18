@@ -96,16 +96,19 @@ class CheckFilesInDirectoryCommand(Command):
 
 class CheckEtcDirectoryCommand(CheckFilesInDirectoryCommand):
 	name = "check_etc"
+	desc = "analyzes /etc directory"
 	command = "find /etc -xdev \( -type f -o -type l \) -exec ls --full-time -lba \{\} \;"
 
 class CheckBootDirectoryCommand(CheckFilesInDirectoryCommand):
 	name = "check_boot"
 	directory = "/boot"
+	desc = "analyzes /boot directory"
 	command = CheckFilesInDirectoryCommand.command % (directory, "f")
 
 class CheckForPipesCommand(CheckFilesInDirectoryCommand):
 	name = "list_pipes"
 	directory = "/"
+	desc = "lists named pipes"
 	command = CheckFilesInDirectoryCommand.command % (directory, "p")
 
 	def compare(prev, cur):
@@ -114,6 +117,7 @@ class CheckForPipesCommand(CheckFilesInDirectoryCommand):
 class FindSuidBinariesCommand(CheckFilesInDirectoryCommand):
 	name = "list_suids"
 	shell = True
+	desc = "lists setuid/setgid executables"
 	command = "find / -xdev -type f \( -perm -4000 -o -perm -2000 \) -exec ls --full-time -lba \{\} \;"
 
 	def compare(prev, cur):

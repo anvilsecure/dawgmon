@@ -40,6 +40,7 @@ class ListInstalledPackagesCommand(Command):
 	name = "list_packages"
 	shell = False
 	command = "/usr/bin/dpkg --list"
+	desc = "analyze changes in installed Debian packages"
 
 	def parse(output):
 		res = {}

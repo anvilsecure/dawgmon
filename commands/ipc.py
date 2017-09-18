@@ -17,6 +17,7 @@ class ListSharedMemorySegmentsCommand(Command):
 	name = "list_shm"
 	shell = False
 	command = "ipcs -m"
+	desc = "analyze changes in System V shared memory segments"
 
 	def parse(output):
 		return parse_ipcs_output(output)
@@ -49,6 +50,7 @@ class ListSemaphoreArraysCommand(Command):
 	name = "list_sem"
 	shell = False
 	command = "ipcs -s"
+	desc = "analyze changes in System V sempahores"
 
 	def parse(output):
 		return parse_ipcs_output(output)
@@ -81,6 +83,7 @@ class ListMessageQueuesCommand(Command):
 	name = "list_msq"
 	shell = False
 	command = "ipcs -q"
+	desc = "analyze changes in System V message queues"
 
 	def parse(output):
 		return parse_ipcs_output(output)
@@ -113,6 +116,7 @@ class ListListeningUNIXSocketsCommand(Command):
 	name = "list_unix_ports"
 	shell = False
 	command = "netstat -lx"
+	desc = "list changes in listening UNIX ports"
 
 	def parse(output):
 		res = {}

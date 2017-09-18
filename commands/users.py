@@ -19,6 +19,7 @@ class CheckGroupsCommand(Command):
 	name = "check_groups"
 	shell = False
 	command = "cat /etc/group"
+	desc = "analyze UNIX group changes"
 
 	def parse(data):
 		data = data.splitlines()
@@ -77,6 +78,7 @@ class CheckUsersCommand(Command):
 	name = "check_users"
 	shell = False
 	command = "cat /etc/passwd"
+	desc = "analyze UNIX user changes"
 
 	def parse(data):
 		data = data.splitlines()

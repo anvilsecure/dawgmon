@@ -4,6 +4,7 @@ class KernelVersionCommand(Command):
 	name = "kernel_version"
 	shell = True
 	command = "/bin/sh -c 'printf \"`uname -a`\\n`uname -v`\"'"
+	desc = "analyze changes in kernel version"
 
 	def parse(output):
 		lines = output.splitlines()
@@ -55,6 +56,7 @@ class LSBVersionCommand(Command):
 	name = "lsb_version"
 	shell = False
 	command = "/usr/bin/lsb_release -idcr"
+	desc = "analyze changes in Linux Standard Base release settings"
 
 	def parse(output):
 		lines = output.splitlines()

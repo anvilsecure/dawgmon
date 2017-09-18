@@ -4,6 +4,7 @@ class EnvironmentVariablesCommand(Command):
 	name = "env"
 	shell = False
 	command = "env"
+	desc = "monitor changes in environment variables"
 
 	def parse(output):
 		lines = output.splitlines()

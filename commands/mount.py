@@ -13,6 +13,7 @@ class MountpointsCommand(Command):
 	name = "list_mount"
 	shell = False
 	command = "/bin/mount"
+	desc = "analyze changes in file system mounts"
 
 	def parse(output):
 		lines = output.splitlines()

@@ -7,6 +7,7 @@ class UptimeCommand(Command):
 	name = "uptime"
 	shell = False
 	command = "uptime -s"
+	desc = "show uptime and check if reboot happened"
 
 	def parse(output):
 		if not output:

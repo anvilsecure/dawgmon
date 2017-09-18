@@ -4,6 +4,7 @@ class ListListeningTCPUDPPortsCommand(Command):
 	name = "list_tcpudp_ports"
 	shell = False
 	command = "netstat --tcp --udp -ln"
+	desc = "list changes in listening TCP/UDP ports for both IPv4/IPv6"
 
 	def parse(output):
 		res = {}
@@ -39,6 +40,7 @@ class ListNetworkInterfacesCommand(Command):
 	name = "list_ifaces"
 	shell = False
 	command = "/bin/ip addr"
+	desc = "analyze changes in network interfaces"	
 
 	def parse(output):
 		res = {}

@@ -4,6 +4,7 @@ class ListBlockDevicesCommand(Command):
 	name = "list_blkdev"
 	shell = False
 	command = "/bin/lsblk -la"
+	desc = "analyze changes in available block devices"
 
 	def parse(output):
 		lines = output.splitlines()

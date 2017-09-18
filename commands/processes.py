@@ -4,6 +4,7 @@ class CheckProcessessCommand(Command):
 	name = "list_processes"
 	shell = False
 	command = "ps aux"
+	desc = "monitors changes in the running processes (mostly for debugging)"
 
 	def parse(output):
 		res = {}
