@@ -1,63 +1,172 @@
 dawgmon - Dawg the Hallway Monitor
 
+SUMMARY
+
 The name of this tool is based upon an episode (season 10, episode 10) of South
 Park in which Cartman is Dawg the Hallway Monitor patrolling the hallways of
 his school.  It's a tool which helps one to monitor changes which have taken
 place on a Linux-based system since the previous time the tool was ran. 
 
-One way to use it is to monitor a whole swath of servers via ansible as dawgmon
-can automatically generate playbooks as well as parse and process the output
-produced by ansible. Combining it with a cronjob which runs dawgmon on a
-regular basis and then mails the result to the mailbox of the system
-administrator can help with identifying machines upon which nefarious things
-are happening.
+One way to use it is to use something like the included sample cronjob to run
+dawgmon on a regular interval and email the results to the system
+administrator. This can help with identifying machines upon which nefarious
+things are happening and monitor who's installing what and where. Please note
+that any serious kernel backdoor will easily be able to hide itself from this
+tool and as such it's just one added tool in one's toolkit but it should not
+relied upon for full security monitoring of Linux machines. It's just one extra
+option in one's toolbox.
 
 The other way it's useful is by generating a baseline before installing a piece
 of software. Then after installing this piece of software one will run the tool
 again and then it's easy to see which changes were made on the system. An
-example after establishing a baseline and then installing tor on an AWS Ubuntu
-Linux machine might yield something like this:
+example after establishing a baseline and then installing virtualbox on a
+machine might yield something like this:
 
-[+] torbox.anvilventures.com: 39 changes detected (0 warnings)
- +  file /etc/apparmor.d/abstractions/tor got created
- +  file /etc/apparmor.d/cache/system_tor got created
- +  file /etc/apparmor.d/local/system_tor got created
- +  file /etc/apparmor.d/system_tor got created
- +  file /etc/cron.weekly/tor got created
- +  file /etc/default/tor got created
- +  size of file /etc/group changed from 806 to 824
- +  file /etc/group got modified on 2017-09-09 17:48:13.730833 +0000
- +  size of file /etc/group- changed from 816 to 806
- +  file /etc/group- got modified on 2017-02-20 12:53:05.000000 +0000
- +  size of file /etc/gshadow changed from 681 to 696
- +  file /etc/gshadow got modified on 2017-09-09 17:48:13.734833 +0000
- +  size of file /etc/gshadow- changed from 687 to 681
- +  file /etc/gshadow- got modified on 2017-02-20 12:53:05.000000 +0000
- +  file /etc/init.d/.depend.boot got modified on 2017-09-09 17:48:14.098839 +0000
- +  size of file /etc/init.d/.depend.start changed from 955 to 988
- +  file /etc/init.d/.depend.start got modified on 2017-09-09 17:48:14.098839 +0000
- +  size of file /etc/init.d/.depend.stop changed from 1019 to 1047
- +  file /etc/init.d/.depend.stop got modified on 2017-09-09 17:48:14.098839 +0000
- +  file /etc/init.d/tor got created
- +  file /etc/logrotate.d/tor got created
- +  size of file /etc/passwd changed from 1837 to 1883
- +  file /etc/passwd got modified on 2017-09-09 17:48:13.778834 +0000
- +  size of file /etc/passwd- changed from 1787 to 1883
- +  file /etc/passwd- got modified on 2017-09-09 17:48:13.000000 +0000
- +  size of file /etc/shadow changed from 1504 to 1536
- +  file /etc/shadow got modified on 2017-09-09 17:48:13.794834 +0000
- +  size of file /etc/shadow- changed from 1376 to 1536
- +  file /etc/shadow- got modified on 2017-09-09 17:48:13.000000 +0000
- +  file /etc/tor/torrc got created
- +  file /etc/tor/torsocks.conf got created
- +  group debian-tor added
- +  user debian-tor added
- +  package tor added to package list
- +  package tor-geoipdb added to package list
- +  package torsocks added to package list
- +  systemd service tor added
- +  port 9050 opened
- +  listening UNIX socket /var/run/tor/control opened
+# ./dawgmon -gfA
+1 change detected (0 warnings)            
++ systemd property NNames changed from 259 to 261
+# apt install virtualbox-5.1
+[...]
+# ./dawgmon -gfA
+33 changes detected (0 warnings)          
++ size of file /etc/group changed from 937 to 954
++ file /etc/group got modified on 2017-09-14 19:29:51.804811 +0200
++ size of file /etc/group- changed from 934 to 937
++ file /etc/group- got modified on 2017-09-14 19:29:14.000000 +0200
++ file /etc/gshadow got modified on 2017-09-14 19:29:51.812811 +0200
++ size of file /etc/gshadow- changed from 777 to 794
++ size of file /etc/mailcap changed from 40777 to 41063
++ file /etc/mailcap got modified on 2017-09-14 19:29:51.632812 +0200
++ file /etc/systemd/system/multi-user.target.wants/vboxautostart-service.service got created (owner=root, group=root, perm=lrwxrwxrwx, size=49)
++ file /etc/systemd/system/multi-user.target.wants/vboxballoonctrl-service.service got created (owner=root, group=root, perm=lrwxrwxrwx, size=51)
++ file /etc/systemd/system/multi-user.target.wants/vboxdrv.service got created (owner=root, group=root, perm=lrwxrwxrwx, size=35)
++ file /etc/systemd/system/multi-user.target.wants/vboxweb-service.service got created (owner=root, group=root, perm=lrwxrwxrwx, size=43)
++ file /etc/udev/rules.d/60-vboxdrv.rules got created (owner=root, group=root, perm=-rw-r--r--, size=747)
++ group vboxusers added
++ package virtualbox-5.1 is to be installed
++ suid binary /usr/lib/virtualbox/VBoxHeadless got created (owner=root, group=root, perm=-r-s--x--x, size=158304)
++ suid binary /usr/lib/virtualbox/VBoxNetAdpCtl got created (owner=root, group=root, perm=-r-s--x--x, size=23144)
++ suid binary /usr/lib/virtualbox/VBoxNetDHCP got created (owner=root, group=root, perm=-r-s--x--x, size=158304)
++ suid binary /usr/lib/virtualbox/VBoxNetNAT got created (owner=root, group=root, perm=-r-s--x--x, size=158304)
++ suid binary /usr/lib/virtualbox/VBoxSDL got created (owner=root, group=root, perm=-r-s--x--x, size=158296)
++ suid binary /usr/lib/virtualbox/VBoxVolInfo got created (owner=root, group=root, perm=-r-s--x--x, size=10472)
++ suid binary /usr/lib/virtualbox/VirtualBox got created (owner=root, group=root, perm=-r-s--x--x, size=158304)
++ i-node for listening UNIX socket /run/systemd/private changed from 3428734 to 3452848
++ systemd property NInstalledJobs changed from 8392199 to 3238035463
++ systemd property NNames changed from 261 to 263
++ systemd unit file vboxautostart-service.service added
++ systemd unit file vboxballoonctrl-service.service added
++ systemd unit file vboxdrv.service added
++ systemd unit file vboxweb-service.service added
++ systemd unit 'vboxautostart-service.service' added
++ systemd unit 'vboxballoonctrl-service.service' added
++ systemd unit 'vboxdrv.service' added
++ systemd unit 'vboxweb-service.service' added
+
+The above helps with now doing a thorough security review of virtualbox. The
+installed suid binaries are obvious points of entry and the run services are
+interesting.
+
+Another example run which correctly detects TCP ports opening and closing:
+
+# ./dawgmon -gfA
+0 changes detected (0 warnings)           
+# nc -l -p 4455 &
+[1] 12489
+# ./dawgmon -gfA
+1 change detected (0 warnings)            
++ port 4455 tcp opened
+# fg
+nc -l -p 4455
+^C
+# ./dawgmon -gfA
+1 change detected (0 warnings)            
++ port 4455 tcp closed
+# 
+
+The tool is not meant for complete accuracy. There are very serious
+recommendations normally to not rely on the output of GNU core-utils such as ls
+for tool input. In other words; one should rarely build tools to parse and rely
+on this type of output as it can change all the time.
+
+However the tradeoff for dawgmon is the following; we would need to implement a
+lot of logic to do file system monitoring ourselves, build complex binaries
+that include libraries to do the parsing and monitoring of block devices, the
+network interfaces and what not more. This will also make the tool way more
+complex and less maintainable. On projects right now one can add a new command
+including change detection in very little time as the main dawgmon tool already
+takes care of caching, executing the command and then supplying the previous
+and current output when running a comparision to a command implementation. This
+means that on time-constrained projects one can very quickly add a new command
+run analysis on them.
+
+A command can be added by simply inheriting from the Command class. This class
+is defined in commands/__init__.py. That file contains also the master list of
+commands (and the order in which they're executed when doing a full analysis).
+Then the properties like 'name', 'shell', 'command' and 'desc' will have to be
+set and two methods 'parse()' and 'compare()' will have to be implemented.
+Enough commands are included to get a good idea on how to implement and add new
+ones. 
+
+
+USAGE
+
+For best results run the tool as root. For help type -h/--help and for version
+information type -v/--version.
+
+A main action will always have to be specified. These actions are:
+-A: analyze the system
+-C: compare cache entries
+-E: list available commands
+-L: list cache entries
+
+# runs an analysis
+dawgmon -A
+
+# runs an analysis but only with a few commands
+dawgmon -A -e list_suids -e list_tcpudp_ports
+
+# shows the list of available commands
+dawgmon -E
+
+# shows available cache entries for comparison
+dawgmon -L
+
+# compare old cache entry 3 with new cache entry 5
+dawgmon -C 3 5
+
+Further options to help with the analysis are:
+
+-d: show debug output
+-e: execute a specific command (can be used multiple times)
+-f: force a run without warning about running as root
+-g: colorize the output
+-l: location of the database cache to use
+-m: maximum amount of cache entries to allow in cache (if cache has more
+    entries than this amount it will truncate the database) 
+
+For more usage information run the tool with -h.
+
+
+LIMITATIONS
+
+The tool parses output of commandline tools and relies on GNU core-utils
+specific options for some of it.  There's no specific reason why this tool and
+the command implementations cannot be quickly ported to other operating systems
+such as the BSD's but right now no Operating System detection is taking place
+nor is there a classification of commands based on Operating System support
+being done. That would have to be implemented first.
+
+Regarding the finding of pipes, UNIX sockets, files in /boot, /etc and more one
+should note that the usage of -xdev passed to 'find' means that not all
+filesystems mounted under the start directory will be traversed. This means
+that for example /boot will be properly scanned but /boot/efi might not be. Some
+smarter approach will have to be used here in the future.
+
+
+ABOUT
 
 All rights reserved. Copyright (C) 2017 by Anvil Ventures, LLC.
+For licensing information see LICENSE.
 For more information contact Vincent Berg <gvb@anvilventures.com>
+To find (updated) source code or contribute patches go to: https://github.com/anvilventures/dawgmon/
