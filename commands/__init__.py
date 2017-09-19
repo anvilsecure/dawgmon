@@ -1,12 +1,13 @@
 # helper routines to turn messages into the right
 # types for displayment later
 WARNING, DEBUG, CHANGE = 0x1, 0x2, 0x3
+from datetime import datetime
 def W(s):
-	return (WARNING, s)
+	return (WARNING, s, datetime.utcnow())
 def D(s):
-	return (DEBUG, s)
+	return (DEBUG, s, datetime.utcnow())
 def C(s):
-	return (CHANGE, s)
+	return (CHANGE, s, datetime.utcnow())
 
 from utils import merge_keys_to_list
 

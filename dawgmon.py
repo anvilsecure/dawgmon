@@ -5,12 +5,12 @@ from datetime import datetime
 from argparse import ArgumentParser
 
 import commands
-from utils import merge_keys_to_list
+from utils import merge_keys_to_list, ts_to_str
 from cache import Cache
 from local import local_run
 from version import VERSION
 
-def compare_output(old, new, commandlist=None):
+def compare_output(old, new, commandlist=None, replace_timestamp=False, timestamps=(None, None)):
 	anomalies = []
 	if not old:
 		# if None is passed in it's simply empty
@@ -31,11 +31,23 @@ def compare_output(old, new, commandlist=None):
 		ret = cmd.compare(old_data, new_data)
 		if type(ret) != list:
 			raise Exception("unexpected return value type for %s" % cmd)
+
+		# replace the timestamp which we need to do if we're for
+		# example comparing two historical cache entries as the
+		# timestamps of the generated anomalies then will be based upon
+		# when the anomaly is being detected which is a runtime
+		# timestamp and not a timestamp associated with the cache
+		# entry.
+		if replace_timestamp:
+			ret = [(r[0], r[1], timestamps[1]) for r in ret]
 		if ret and len(ret) > 0:
 			anomalies = anomalies + ret
 	return anomalies
 
-def print_anomalies(anomalies, show_debug=False, show_color=True):
+def get_ts(ts, show_timestamp=True):
+	return "[%s] " % ts_to_str(ts) if show_timestamp else ""
+
+def print_anomalies(anomalies, show_debug=False, show_color=True, show_timestamp=True, timestamps=(None, None)):
 	changes = list(filter(lambda x:x[0] == commands.CHANGE, anomalies))
 	warning = list(filter(lambda x:x[0] == commands.WARNING, anomalies))
 	debug = list(filter(lambda x:x[0] == commands.DEBUG, anomalies)) if show_debug else []
@@ -46,14 +58,16 @@ def print_anomalies(anomalies, show_debug=False, show_color=True):
 	c_end = "\x1b[0m" if show_color else ""
 	la, lw, ld = len(changes), len(warning), len(debug)
 	debugs = " and %i debug message%s" % (ld, "s" if ld != 1 else "") if ld > 0 else ""
-	print("%s%i change%s detected (%i warning%s%s)%s" % (c1, la, "s" if la != 1 else "", lw, "s" if lw != 1 else "", debugs, c_end))
+	timestamps = [ts_to_str(t) for t in list(timestamps)]
+	betweens = " between [%s] and [%s] " % (timestamps[0], timestamps[1]) if show_timestamp else ""
+	print("%s%i change%s detected (%i warning%s%s)%s%s" % (c1, la, "s" if la != 1 else "", lw, "s" if lw != 1 else "", debugs, betweens, c_end))
 	for w in warning:
-		print("%s! %s%s" % (c2, w[1], c_end))
+		print("%s%s! %s%s" % (c2, get_ts(w[2], show_timestamp), w[1], c_end))
 	for c in changes:
-		print("%s+ %s%s" % (c3, c[1], c_end))
+		print("%s%s+ %s%s" % (c3, get_ts(c[2], show_timestamp), c[1], c_end))
 	if show_debug:
 		for d in debug:
-			print("%s- %s%s" % (c4, d[1], c_end))
+			print("%s%s- %s%s" % (c4, get_ts(d[2], show_timestamp), d[1], c_end))
 
 def run(tmpdirname):
 
@@ -76,6 +90,7 @@ def run(tmpdirname):
 	parser.add_argument("-l", help="location of database cache (default: $HOME/%s)" % (default_cache_name), dest="cache_location", metavar="filename", default=None, required=False)
 	parser.add_argument("-m", help="max amount of cache entries per host (default: %i)" % default_max_cache_entries,
 		dest="max_cache_entries", type=int, metavar="N", default=default_max_cache_entries, required=False)
+	parser.add_argument("-t", help="do not output timestamps", dest="show_timestamps", default=True, action="store_false")
 	parser.add_argument("-v", "--version", action="version", version="dawgmon %s" % VERSION)
 	args = parser.parse_args()
 
@@ -166,12 +181,16 @@ def run(tmpdirname):
 
 		# add new entry to cache if needed but only if a full command list is being executed
 		old = cache.get_last_entry()
+		old_ts = cache.get_last_entry_timestamp()
+		new_ts = datetime.utcnow()
+
 		if add_to_cache:
 			if not old:
 				anomalies.append(commands.W("no cache entry found yet so caching baseline"))
-			cache.add_entry(new)
+			cache.add_entry(new, timestamp=new_ts)
 		else:
 			anomalies.append(commands.W("results NOT cached as only partial command list being run"))
+		change_timestamps = False
 	else:
 		new = cache.get_entry(args.compare_cache[1])
 		if not new:
@@ -181,14 +200,17 @@ def run(tmpdirname):
 		if not old:
 			print("cannot find cache entry with id %i" % args.compare_cache[0])
 			return
+		new_ts = cache.get_entry_timestamp(args.compare_cache[1])
+		old_ts = cache.get_entry_timestamp(args.compare_cache[0])
+		change_timestamps = True
 
 	# merge the list of differences with the previous list this is done
 	# such that the warnings added above will appear first when outputting
 	# the warnings later on in print_anomalies
-	anomalies = anomalies + compare_output(old, new, args.commandlist)
+	anomalies = anomalies + compare_output(old, new, args.commandlist, change_timestamps, (old_ts, new_ts))
 
 	# output the detected anomalies
-	print_anomalies(anomalies, args.show_debug, args.colorize)
+	print_anomalies(anomalies, args.show_debug, args.colorize, args.show_timestamps, (old_ts, new_ts))
 
 	# update the cache
 	cache.purge(args.max_cache_entries)

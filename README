@@ -146,6 +146,7 @@ Further options to help with the analysis are:
 -l: location of the database cache to use
 -m: maximum amount of cache entries to allow in cache (if cache has more
 entries than this amount it will truncate the database) 
+-t: do not output timestamp information per detected anomaly.
 
 For more usage information run the tool with -h.
 
@@ -164,6 +165,16 @@ should note that the usage of -xdev passed to 'find' means that not all
 filesystems mounted under the start directory will be traversed. This means
 that for example /boot will be properly scanned but /boot/efi might not be.
 Some smarter approach will have to be used here in the future.
+
+The timestamps when doing a current analysis might be a bit confusing. By
+default a timestamp for a warning, normal or debug anomaly message will be the
+timestamp of its generation time (as can be seen in commands/__init__.py). The
+anomalies are generated after a full commandline scan has been done. So the
+output upon which this detection works was generated earlier and subsequently
+the timestamps for individual anomalies show a time after the time of the scan.
+When comparing cache entries the timestamp of the scan is being used to output
+the time at which the detection happend as that makes logically simply more
+sense.
 
 
 ABOUT

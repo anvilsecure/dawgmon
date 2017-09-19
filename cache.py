@@ -1,6 +1,8 @@
 import json 
 from datetime import datetime
 
+from utils import ts_to_str, str_to_ts
+
 class CacheException(Exception):
 	pass
 
@@ -60,10 +62,34 @@ class Cache:
 			return None
 		return self.data[hostname][entry_id]["data"]
 
+	def get_entry_timestamp(self, entry_id, hostname="localhost"):
+		entries = self.get_entries(hostname)
+		if len(entries) == 0:
+			return None
+		if entry_id == -1:
+			# default to the last entry
+			entry_id = entries[-1]["id"]
+		elif entry_id >= len(self.data[hostname]):
+			return None
+
+		# fall back automatically on timestamps that do not record
+		# subsecond intervals such as the timestamps that are in old
+		# caches
+		ts = self.data[hostname][entry_id]["timestamp"]
+		try:
+			return str_to_ts(ts)
+		except ValueError:
+			return str_to_ts(ts, False)
+
 	def get_last_entry(self, hostname="localhost"):
 		return self.get_entry(-1, hostname)
 
-	def add_entry(self, data, hostname="localhost"):
+	def get_last_entry_timestamp(self, hostname="localhost"):
+		return self.get_entry_timestamp(-1, hostname)
+
+	def add_entry(self, data, hostname="localhost", timestamp=None):
 		self.data.setdefault(hostname, [])
-		tsnow = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+		if not timestamp:
+			timestamp = datetime.utcnow()
+		tsnow = ts_to_str(timestamp)
 		self.data[hostname].append({"timestamp":tsnow, "data":data})
