@@ -17,3 +17,5 @@
 - add versioning to the cache database to be able to give a warning when cache
   is outdated versus the tool and ignore its data instead of throwing random
 errors and exceptions
+
+- look at replacing netstat with ss/sockstat on lnx/freebsd
