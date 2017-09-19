@@ -13,3 +13,7 @@
   type of OS being detected f.e. execute on fbsd/obsd with find/ls commandline options
   which are standard on the BSDs and on lnx execute with different ones standard
   in the GNU coreutils world
+
+- add versioning to the cache database to be able to give a warning when cache
+  is outdated versus the tool and ignore its data instead of throwing random
+errors and exceptions
