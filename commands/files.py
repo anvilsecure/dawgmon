@@ -17,7 +17,7 @@ class CheckFilesInDirectoryCommand(Command):
 	# command option --full-time is GNU file utils specific
 	# -b is for escaping characters in the filename such as spaces and what not more
 	# two arguments should be start directory and file type (pipe, symlink, regular file etc)
-	command = "find %s -ignore_readdir_race -type %s -exec ls --full-time -lba \{\} \;"
+	command = "find %s -xdev -ignore_readdir_race -type %s -exec ls --full-time -lba \{\} \;"
 
 	def parse(output):
 		res = {}
@@ -97,7 +97,7 @@ class CheckFilesInDirectoryCommand(Command):
 class CheckEtcDirectoryCommand(CheckFilesInDirectoryCommand):
 	name = "check_etc"
 	desc = "analyzes /etc directory"
-	command = "find /etc -ignore_readdir_race \( -type f -o -type l \) -exec ls --full-time -lba \{\} \;"
+	command = "find /etc -xdev -ignore_readdir_race \( -type f -o -type l \) -exec ls --full-time -lba \{\} \;"
 
 class CheckBootDirectoryCommand(CheckFilesInDirectoryCommand):
 	name = "check_boot"
@@ -118,7 +118,7 @@ class FindSuidBinariesCommand(CheckFilesInDirectoryCommand):
 	name = "list_suids"
 	shell = True
 	desc = "lists setuid/setgid executables"
-	command = "find / -ignore_readdir_race -type f \( -perm -4000 -o -perm -2000 \) -exec ls --full-time -lba \{\} \;"
+	command = "find / -xdev -ignore_readdir_race -type f \( -perm -4000 -o -perm -2000 \) -exec ls --full-time -lba \{\} \;"
 
 	def compare(prev, cur):
 		return CheckFilesInDirectoryCommand.compare(prev, cur, "suid binary")
