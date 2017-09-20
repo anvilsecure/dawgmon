@@ -61,7 +61,7 @@ class MountpointsCommand(Command):
 					anomalies.append(C("attribute %s got added to mount %s%s" % (attr, mount, sval)))
 					continue
 				elif attr not in cattr:
-					sval = " with value %s" % cattr[attr] if cattr[attr] else ""
+					sval = " with value %s" % pattr[attr] if pattr[attr] else ""
 					anomalies.append(C("attribute %s was removed from mount %s%s" % (attr, mount, sval)))
 					continue
 				pa, ca = pattr[attr], cattr[attr]
