@@ -14,10 +14,8 @@ def remove_footer_from_table(output):
 		full_lines.append(l)
 	return full_lines
 
-# output tables in systemd are made up relatively uniformly so this function
-# has the ability to parse them into a list of dictionaries with one dictonary
-# for each row. Each dictionary's keys are automatically derived from the table
-# header.
+# output tables in systemd are made up relatively uniformly so this function has the ability to parse them into a list of dictionaries with one dictonary for each row. Each dictionary's keys are 
+# automatically derived from the table header.
 def parse_systemd_output_table(output):
 	res = []
 	lines = remove_footer_from_table(output)
@@ -29,8 +27,7 @@ def parse_systemd_output_table(output):
 	offsets = [headers.find(h) for h in hs]
 	# use lowercase headers for entries in dict entries
 	headers = [h.lower() for h in hs]
-	# parse and add each entry ignoring header and last two lines
-	# as those are either empty or showing the total entry count
+	# parse and add each entry ignoring header and last two lines as those are either empty or showing the total entry count
 	for line in lines[1:]:
 		j = 0
 		e = {}
@@ -67,6 +64,7 @@ class ListSystemDSocketsCommand(Command):
 				continue
 			elif listen not in cur:
 				anomalies.append(C("systemd socket %s removed" % listen))
+				continue
 			p, c = prev[listen], cur[listen]
 			if p[0] != c[0]:
 				anomalies.append(C("systemd socket %s came from unit %s but now comes from %s" % (listen, p[0], c[0])))
@@ -96,6 +94,7 @@ class ListSystemDTimersCommand(Command):
 				continue
 			elif unit not in cur:
 				anomalies.append(C("systemd timer %s removed" % unit))
+				continue
 			p, c = prev[unit], cur[unit]
 			if p[0] != c[0]:
 				anomalies.append(C("systemd timer %s used to activate %s but now %s" % (unit, p[0], c[0])))
@@ -149,9 +148,7 @@ class ListSystemDUnitFilesCommand(Command):
 
 	def parse(output):
 		res = {}
-		# hack as the header detection won't work otherwise in the
-		# utility function used below because there's a space
-		# in the first header 'UNIT FILE'
+		# hack as the header detection won't work otherwise in the utility function used below because there's a space in the first header 'UNIT FILE'
 		lines = output.splitlines()
 		if len(lines) == 0: # happens for default no output
 			return res
