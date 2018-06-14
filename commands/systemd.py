@@ -67,6 +67,7 @@ class ListSystemDSocketsCommand(Command):
 				continue
 			elif listen not in cur:
 				anomalies.append(C("systemd socket %s removed" % listen))
+                                continue
 			p, c = prev[listen], cur[listen]
 			if p[0] != c[0]:
 				anomalies.append(C("systemd socket %s came from unit %s but now comes from %s" % (listen, p[0], c[0])))
