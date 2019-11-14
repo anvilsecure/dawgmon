@@ -5,7 +5,7 @@ with open("README", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="dawgmon-gvb",
+    name="dawgmon",
     version=VERSION,
     author="Anvil Ventures",
     author_email="info@anvilventures.com",
