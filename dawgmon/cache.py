@@ -1,7 +1,7 @@
 import json 
 from datetime import datetime
 
-from utils import ts_to_str, str_to_ts
+from dawgmon.utils import ts_to_str, str_to_ts
 
 class CacheException(Exception):
 	pass

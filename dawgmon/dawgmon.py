@@ -4,11 +4,11 @@ import sys, os, tempfile, functools
 from datetime import datetime
 from argparse import ArgumentParser
 
-import commands
-from utils import merge_keys_to_list, ts_to_str
-from cache import Cache
-from local import local_run
-from version import VERSION
+import dawgmon.commands as commands
+from dawgmon.utils import merge_keys_to_list, ts_to_str
+from dawgmon.cache import Cache
+from dawgmon.local import local_run
+from dawgmon.version import VERSION
 
 def compare_output(old, new, commandlist=None, replace_timestamp=False, timestamps=(None, None)):
 	anomalies = []

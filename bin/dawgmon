@@ -6,5 +6,5 @@ if [ $PYTHONVERSION -lt "3" ]; then
 echo "Requires at least Python 3.3"
 exit 1
 fi
-export PYTHONPATH=$DIR
-$PYBIN -B $DIR "$@"
+export PYTHONPATH=$DIR/../
+$PYBIN -m dawgmon "$@"

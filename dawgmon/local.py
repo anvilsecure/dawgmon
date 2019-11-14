@@ -1,5 +1,5 @@
 import subprocess, shlex
-import commands
+from dawgmon import commands
 
 def local_run(dirname, commandlist):
 	for cmdname in commandlist:

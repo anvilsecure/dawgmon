@@ -9,7 +9,7 @@ def D(s):
 def C(s):
 	return (CHANGE, s, datetime.utcnow())
 
-from utils import merge_keys_to_list
+from ..utils import merge_keys_to_list
 
 # base Command class
 class Command:
